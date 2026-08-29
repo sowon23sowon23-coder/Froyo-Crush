@@ -446,7 +446,11 @@ function showCombo(n){
   el.textContent = n>=4 ? 'YUM! x'+n : n===3 ? 'SWEET! x3' : 'COMBO x2';
   el.classList.remove('go'); void el.offsetWidth; el.classList.add('go');
 }
-function shake(){ const p=document.getElementById('phone'); p.classList.add('shake'); setTimeout(()=>p.classList.remove('shake'),340) }
+function shake(){
+  const p=document.querySelector('.boardwrap');
+  p.classList.add('shake');
+  setTimeout(()=>p.classList.remove('shake'),240);
+}
 
 async function checkEnd(){
   clearHint();

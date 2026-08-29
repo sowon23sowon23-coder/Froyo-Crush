@@ -57,11 +57,12 @@ body{
   }
   .notch{display:none}
 }
-.phone.shake{animation:shake .32s}
+.boardwrap.shake{animation:shake .22s}
 @keyframes shake{
-  0%,100%{transform:translate(0,0)}
-  20%{transform:translate(-6px,3px)} 40%{transform:translate(5px,-3px)}
-  60%{transform:translate(-4px,-2px)} 80%{transform:translate(3px,2px)}
+  0%,100%{translate:0 0}
+  25%{translate:-2px 1px}
+  50%{translate:2px -1px}
+  75%{translate:-1px 1px}
 }
 .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:26px;background:#1B0310;border-radius:0 0 16px 16px;z-index:60}
 
@@ -214,7 +215,7 @@ body{
 .tile.sel .body{box-shadow:inset 0 -5px 8px rgba(0,0,0,.28), inset 0 4px 6px rgba(255,255,255,.55), 0 0 0 3px #fff, 0 0 16px 4px var(--gold)}
 @keyframes wiggle{0%,100%{rotate:-7deg}50%{rotate:7deg}}
 .tile.pop{animation:popout .26s forwards}
-@keyframes popout{0%{transform:scale(1)}45%{transform:scale(1.32)}100%{transform:scale(0);opacity:0}}
+@keyframes popout{0%{scale:1}45%{scale:1.32}100%{scale:0;opacity:0}}
 @keyframes pop{0%{transform:scale(.5)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
 
 .float{position:absolute;font-family:var(--display);font-weight:800;font-size:17px;color:var(--gold);text-shadow:0 2px 0 rgba(90,4,42,.7);pointer-events:none;animation:floatup .8s ease-out forwards;z-index:20}
