@@ -209,8 +209,7 @@ async function shuffleBoard(){
   for(let r=0;r<R;r++)for(let c=0;c<C;c++){
     const o=grid[r][c], t=TYPES[types[i++]];
     o.type=TYPES.indexOf(t);
-    o.el.querySelector('.body').style.background=`radial-gradient(circle at 32% 26%, ${t.a}, ${t.b} 78%)`;
-    o.el.querySelector('em').textContent=t.e;
+    paintTile(o);
     o.el.animate([{rotate:'0deg'},{rotate:'360deg'}],{duration:430,delay:(r+c)*12});
   }
   blip(700,.18,'sawtooth',.04); buzz(20);
@@ -235,13 +234,23 @@ const TARGET=6000;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const cell=()=>board.clientWidth/C;
 
-function makeTile(type){
+function makeTile(type, special=null){
   const t=TYPES[type];
   const el=document.createElement('div');
   el.className='tile';
   el.innerHTML=`<span class="body" style="background:radial-gradient(circle at 32% 26%, ${t.a}, ${t.b} 78%)"></span><span class="gloss"></span><em>${t.e}</em>`;
   board.appendChild(el);
-  return {type, el};
+  const o={type, special, el};
+  paintTile(o);
+  return o;
+}
+function paintTile(o){
+  const t=TYPES[o.type];
+  o.el.classList.toggle('special-line-h', o.special==='line-h');
+  o.el.classList.toggle('special-line-v', o.special==='line-v');
+  o.el.classList.toggle('special-bomb', o.special==='bomb');
+  o.el.querySelector('.body').style.background=`radial-gradient(circle at 32% 26%, ${t.a}, ${t.b} 78%)`;
+  o.el.querySelector('em').textContent = o.special==='bomb' ? '✦' : t.e;
 }
 function place(o,r,c,instant){
   const s=cell(), pad=s*0.07;
@@ -252,20 +261,31 @@ function place(o,r,c,instant){
   if(instant) requestAnimationFrame(()=>o.el.style.transition='');
   o.r=r; o.c=c;
 }
-function matchesAt(g){
-  const hit=new Set();
+function matchGroups(g){
+  const groups=[];
   for(let r=0;r<R;r++) for(let c=0;c<C-2;c++){
     const a=g[r][c],b=g[r][c+1],d=g[r][c+2];
     if(a&&b&&d&&a.type===b.type&&b.type===d.type){
-      let k=c; while(k<C&&g[r][k]&&g[r][k].type===a.type){hit.add(g[r][k]);k++}
+      const tiles=[];
+      let k=c; while(k<C&&g[r][k]&&g[r][k].type===a.type){tiles.push(g[r][k]);k++}
+      groups.push({tiles, dir:'h'});
+      c=k-1;
     }
   }
   for(let c=0;c<C;c++) for(let r=0;r<R-2;r++){
     const a=g[r][c],b=g[r+1][c],d=g[r+2][c];
     if(a&&b&&d&&a.type===b.type&&b.type===d.type){
-      let k=r; while(k<R&&g[k][c]&&g[k][c].type===a.type){hit.add(g[k][c]);k++}
+      const tiles=[];
+      let k=r; while(k<R&&g[k][c]&&g[k][c].type===a.type){tiles.push(g[k][c]);k++}
+      groups.push({tiles, dir:'v'});
+      r=k-1;
     }
   }
+  return groups;
+}
+function matchesAt(g){
+  const hit=new Set();
+  matchGroups(g).forEach(group=>group.tiles.forEach(t=>hit.add(t)));
   return [...hit];
 }
 function buildBoard(){
@@ -352,6 +372,12 @@ async function trySwap(a,b){
   swapCells(a,b); place(a,a.r,a.c); place(b,b.r,b.c);
   await sleep(190);
   if(matchesAt(grid).length===0){
+    const specials=[a,b].filter(t=>t.special);
+    if(specials.length){
+      moves--; syncHud();
+      await clearSpecials(specials);
+      busy=false; checkEnd(); return;
+    }
     swapCells(a,b); place(a,a.r,a.c); place(b,b.r,b.c);
     shake(); blip(180,.12,'square',.04);
     await sleep(200); busy=false; return;
@@ -369,7 +395,10 @@ function swapCells(a,b){
 async function resolve(){
   let combo=0;
   while(true){
-    const hits=matchesAt(grid);
+    const groups=matchGroups(grid);
+    if(!groups.length) break;
+    const specials=createSpecials(groups);
+    const hits=expandSpecialHits(groupsToHits(groups, specials));
     if(!hits.length) break;
     combo++;
     if(combo>1) showCombo(combo);
@@ -386,12 +415,88 @@ async function resolve(){
     if(wasOpen && goal<=0) setTimeout(()=>{ showBanner('GOAL COMPLETE!'); blip(1320,.2,'triangle',.06) }, 260);
     popTiles(hits, pts);
     hits.forEach(t=>{ grid[t.r][t.c]=null; });
+    specials.forEach(({tile, special})=>{
+      if(!tile.el.isConnected) return;
+      tile.special=special;
+      tile.el.classList.remove('pop');
+      paintTile(tile);
+      grid[tile.r][tile.c]=tile;
+      tile.el.animate([{scale:.55, rotate:'-12deg'},{scale:1.18, rotate:'8deg'},{scale:1, rotate:'0deg'}],{duration:420,easing:'cubic-bezier(.2,1.5,.4,1)'});
+    });
     syncHud();
     await sleep(230);
     hits.forEach(t=>t.el.remove());
     dropAndFill();
     await sleep(240);
   }
+}
+function groupsToHits(groups, specials){
+  const saved=new Set(specials.map(s=>s.tile));
+  const hit=new Set();
+  groups.forEach(group=>group.tiles.forEach(t=>{ if(!saved.has(t)) hit.add(t); }));
+  return [...hit];
+}
+function createSpecials(groups){
+  const made=[];
+  const used=new Set();
+  groups
+    .filter(group=>group.tiles.length>=4 && !group.tiles.some(t=>t.special))
+    .sort((a,b)=>b.tiles.length-a.tiles.length)
+    .forEach(group=>{
+      const tile=group.tiles[Math.floor(group.tiles.length/2)];
+      if(used.has(tile)) return;
+      used.add(tile);
+      made.push({tile, special:group.tiles.length>=5 ? 'bomb' : group.dir==='h' ? 'line-h' : 'line-v'});
+    });
+  if(made.length){
+    const best=made.some(s=>s.special==='bomb') ? 'FROYO BOMB!' : 'LINE CLEAR!';
+    showBanner(best);
+    blip(1180,.16,'triangle',.055);
+  }
+  return made;
+}
+function expandSpecialHits(hits){
+  const all=new Set(hits);
+  let expanded=true;
+  while(expanded){
+    expanded=false;
+    [...all].forEach(t=>{
+      if(!t.special) return;
+      const before=all.size;
+      if(t.special==='line-h'){
+        for(let c=0;c<C;c++) if(grid[t.r][c]) all.add(grid[t.r][c]);
+      }else if(t.special==='line-v'){
+        for(let r=0;r<R;r++) if(grid[r][t.c]) all.add(grid[r][t.c]);
+      }else if(t.special==='bomb'){
+        for(let r=t.r-1;r<=t.r+1;r++) for(let c=t.c-1;c<=t.c+1;c++)
+          if(grid[r]&&grid[r][c]) all.add(grid[r][c]);
+      }
+      expanded = expanded || all.size>before;
+    });
+  }
+  if([...all].some(t=>t.special)){
+    showBanner('SPECIAL BLAST!');
+    flashScreen(); shake(); buzz(28);
+  }
+  return [...all];
+}
+async function clearSpecials(specials){
+  const hits=expandSpecialHits(specials);
+  const straws=hits.filter(t=>TYPES[t.type].k==='straw');
+  const wasOpen=goal>0;
+  goal-=straws.length;
+  const pts=hits.length*55;
+  score+=pts;
+  straws.forEach((t,i)=>flyToGoal(t, i*65));
+  popTiles(hits, pts);
+  hits.forEach(t=>{ grid[t.r][t.c]=null; });
+  syncHud();
+  await sleep(230);
+  hits.forEach(t=>t.el.remove());
+  dropAndFill();
+  await sleep(260);
+  if(wasOpen && goal<=0) showBanner('GOAL COMPLETE!');
+  await resolve();
 }
 function popTiles(hits, pts){
   hits.forEach(t=>{
@@ -523,6 +628,7 @@ async function useArmed(o){
       if(grid[r]&&grid[r][c]) hits.push(grid[r][c]);
     blip(110,.3,'sawtooth',.06); shake();
   }
+  hits=expandSpecialHits(hits);
   goal-=hits.filter(t=>TYPES[t.type].k==='straw').length;
   score+=hits.length*30;
   popTiles(hits, hits.length*30);
