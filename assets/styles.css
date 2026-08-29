@@ -311,6 +311,13 @@ body{
 .rcard small{display:block;font-size:10px;color:#9E7387;font-weight:500}
 .rcard code{font-size:11px;font-weight:700;color:var(--lime-dk);letter-spacing:.5px}
 .use{border:none;background:linear-gradient(#C8ED7E,var(--lime));color:#2C4A00;font-family:var(--display);font-weight:800;font-size:12px;padding:9px 13px;border-radius:12px;cursor:pointer;box-shadow:0 3px 0 #4E7511;flex:none}
+.rcard.used{filter:grayscale(.5);opacity:.62}
+.use:disabled{cursor:default;filter:grayscale(.7);opacity:.6}
+.empty-state{
+  margin:0 18px 12px;padding:28px 18px;border-radius:20px;background:#fff;
+  color:#9E7387;text-align:center;font-size:12px;font-weight:700;
+  box-shadow:0 5px 0 rgba(59,6,32,.12);
+}
 
 /* ---------- 09 coupon ---------- */
 #s-coupon{background:linear-gradient(#FFF4EA,#FFD9E7);padding-top:44px;align-items:center}

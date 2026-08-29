@@ -1,8 +1,32 @@
 /* ---------------- screen router ---------------- */
 const screens=[...document.querySelectorAll('.screen')];
+const LEVELS=[
+  {n:4,name:'Berry Blast',goal:15,moves:18,target:6000,types:6},
+  {n:5,name:'Kiwi Rush',goal:18,moves:20,target:7600,types:6},
+  {n:6,name:'Topping Sprint',goal:20,moves:19,target:9000,types:6,reward:'free-topping'},
+  {n:7,name:'Mango Pop',goal:22,moves:18,target:10600,types:6},
+  {n:8,name:'Froyo Fever',goal:24,moves:17,target:12400,types:6,reward:'discount'},
+  {n:9,name:'Crunch Time',goal:26,moves:17,target:14200,types:6},
+  {n:10,name:'Cup Finale',goal:30,moves:16,target:16800,types:6,reward:'free-cup'}
+];
+const REWARDS={
+  'free-topping':{title:'Free topping',desc:'On any regular cup. Valid until Sep 30, 2026 at any Yogurtland store.',code:'YL-A8F92K',valid:'Valid until Sep 30, 2026',icon:'🍓'},
+  discount:{title:'10% off any cup',desc:'A little extra sweetness for your next visit. Valid until Oct 31, 2026.',code:'YL-C7D34M',valid:'Valid until Oct 31, 2026',icon:'🍨'},
+  'free-cup':{title:'Free cup',desc:'You crushed the finale. Valid until Nov 30, 2026 at any Yogurtland store.',code:'YL-F9P21Q',valid:'Valid until Nov 30, 2026',icon:'🏆'}
+};
+const SAVE_KEY='froyo-crush-progress-v1';
+let state=loadState();
+let activeRewardId=null;
+let justUnlockedReward=null;
+
 function go(id){
   screens.forEach(s=>s.classList.toggle('on', s.id===id));
   document.querySelectorAll('.ov').forEach(o=>o.classList.remove('on'));
+  renderProgress();
+  if(id==='s-rewards') renderRewards();
+  if(id==='s-coupon') renderCoupon(activeRewardId);
+  if(id==='s-used') redeemActiveCoupon();
+  if(id==='s-reward') renderUnlockedReward();
   if(id==='s-game') startLevel();
   if(id==='s-map') buildMap();
 }
@@ -11,6 +35,26 @@ document.addEventListener('click',e=>{
 });
 document.getElementById('s-splash').onclick=()=>go('s-login');
 go('s-splash');
+
+function loadState(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'{}');
+    return {
+      currentLevel:saved.currentLevel||4,
+      unlockedLevel:Math.max(4,saved.unlockedLevel||4),
+      stars:saved.stars||{},
+      rewards:saved.rewards||{}
+    };
+  }catch(e){
+    return {currentLevel:4,unlockedLevel:4,stars:{},rewards:{}};
+  }
+}
+function saveState(){ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+function levelFor(n){ return LEVELS.find(l=>l.n===n) || LEVELS[LEVELS.length-1]; }
+function currentLevel(){ return levelFor(Math.min(state.currentLevel, state.unlockedLevel)); }
+function nextReward(){
+  return LEVELS.find(l=>l.n>=state.unlockedLevel && l.reward && !state.rewards[l.reward]);
+}
 
 /* ---------------- splash sprinkles ---------------- */
 const sp=document.getElementById('sprinkles');
@@ -107,7 +151,157 @@ function buildMap(){
   flag.style.cssText=`left:${tip.x}px;top:${tip.y-48}px`;
   flag.textContent='FREE CUP · LEVEL 12'; host.appendChild(flag);
 }
-document.getElementById('homeProg').style.width='62%';
+function renderProgress(){
+  const level=currentLevel();
+  const reward=nextReward();
+  document.getElementById('homeLevel').textContent=String(level.n).padStart(2,'0');
+  document.getElementById('gameLevel').textContent=String(level.n).padStart(2,'0');
+  document.getElementById('clearLevel').textContent='Level '+String(level.n).padStart(2,'0');
+  if(reward){
+    const remaining=Math.max(0,reward.n-state.unlockedLevel+1);
+    const r=REWARDS[reward.reward];
+    document.getElementById('homeReward').innerHTML=r.title.replace(' ','<br>')+' '+r.icon;
+    document.getElementById('homeNote').innerHTML='Clear <b>'+remaining+' more level'+(remaining===1?'':'s')+'</b> to unlock it';
+    document.getElementById('mapRewardTitle').textContent=r.title;
+    document.getElementById('mapRewardNote').textContent='Clear '+remaining+' more level'+(remaining===1?'':'s');
+    document.getElementById('homeProg').style.width=Math.min(100,(state.unlockedLevel-4)/(reward.n-4)*100)+'%';
+  }else{
+    document.getElementById('homeReward').innerHTML='All<br>claimed 🏆';
+    document.getElementById('homeNote').innerHTML='All rewards unlocked';
+    document.getElementById('mapRewardTitle').textContent='All rewards';
+    document.getElementById('mapRewardNote').textContent='All rewards unlocked';
+    document.getElementById('homeProg').style.width='100%';
+  }
+}
+
+buildMap=function(){
+  const host=document.getElementById('swirlMap');
+  let blobs='';
+  for(let i=0;i<=190;i++){
+    const p=swirlPoint(i/190);
+    blobs+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.r.toFixed(1)}" fill="url(#swg)" stroke="#EFD9E3" stroke-width="1" stroke-opacity=".5"/>`;
+  }
+  host.innerHTML=`
+  <svg viewBox="0 0 360 640" width="360" height="640">
+    <defs>
+      <radialGradient id="swg" cx="34%" cy="28%" r="78%">
+        <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#F0D8E4"/>
+      </radialGradient>
+      <linearGradient id="cup" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#F6E5EC"/><stop offset=".45" stop-color="#FFFFFF"/><stop offset="1" stop-color="#EBD3DE"/>
+      </linearGradient>
+    </defs>
+    <ellipse cx="180" cy="612" rx="108" ry="16" fill="#8A0B44" opacity=".14"/>
+    ${blobs}
+    <path d="M74 500h212l-20 96a16 16 0 0 1-16 13H110a16 16 0 0 1-16-13z" fill="url(#cup)" stroke="#E4C7D5" stroke-width="2"/>
+    <ellipse cx="180" cy="500" rx="106" ry="15" fill="#FFFFFF" stroke="#E4C7D5" stroke-width="2"/>
+    <text x="180" y="558" text-anchor="middle" font-family="Baloo 2, sans-serif" font-size="19" font-weight="800" fill="#C10F5E">Yogurtland</text>
+    <text x="180" y="574" text-anchor="middle" font-family="Poppins, sans-serif" font-size="9" font-weight="700" fill="#8CC63F">get real.</text>
+  </svg>`;
+
+  const toppings=[[0.10,'🍓',22],[0.24,'🫐',18],[0.38,'🥝',20],[0.52,'🍫',17],[0.66,'🥭',16],[0.80,'🍡',14]];
+  toppings.forEach(([t,e,s])=>{
+    const p=swirlPoint(t+0.055);
+    const d=document.createElement('div'); d.className='topping';
+    d.style.cssText=`left:${p.x-46*(1-t*.7)}px;top:${p.y+4}px;font-size:${s}px`;
+    d.textContent=e; host.appendChild(d);
+  });
+
+  LEVELS.forEach((level,i)=>{
+    const lvl=level.n, t=0.055+i*0.142, p=swirlPoint(t);
+    const nodeState = lvl===state.currentLevel?'now' : lvl<=state.unlockedLevel?'done':'lock';
+    const n=document.createElement('div');
+    n.className='node '+nodeState;
+    n.style.left=p.x+'px'; n.style.top=p.y+'px';
+    const sc=1-t*0.22; n.style.scale=sc;
+    n.textContent = nodeState==='lock' ? '🔒' : lvl;
+    if(nodeState!=='lock') n.onclick=()=>{ state.currentLevel=lvl; saveState(); go('s-game'); };
+    host.appendChild(n);
+
+    const st=document.createElement('div'); st.className='stars';
+    st.style.left=p.x+'px'; st.style.top=(p.y+30*sc)+'px';
+    st.style.fontSize=(12*sc)+'px';
+    const earned=state.stars[lvl]||0;
+    st.textContent = earned ? '★'.repeat(earned)+'☆'.repeat(3-earned) : nodeState==='now' ? '' : '☆☆☆';
+    st.style.opacity = nodeState==='lock' ? .35 : 1;
+    host.appendChild(st);
+
+    if(level.reward){
+      const g=document.createElement('div'); g.className='gift';
+      g.style.left=(p.x + (p.x<180?-44:44))+'px'; g.style.top=p.y+'px'; g.textContent='🎁';
+      host.appendChild(g);
+    }
+    if(nodeState==='now'){
+      const y=document.createElement('div'); y.className='youhere';
+      y.style.left=(p.x + (p.x<180?66:-66))+'px'; y.style.top=(p.y-2)+'px';
+      y.textContent='YOU ARE HERE';
+      host.appendChild(y);
+    }
+  });
+};
+
+function renderRewards(){
+  const list=document.getElementById('rewardList');
+  const earnedIds=Object.keys(state.rewards);
+  const available=earnedIds.filter(id=>!state.rewards[id].used);
+  const redeemed=earnedIds.filter(id=>state.rewards[id].used);
+  document.getElementById('availableCount').textContent='AVAILABLE ('+available.length+')';
+  document.getElementById('redeemedCount').textContent='REDEEMED ('+redeemed.length+')';
+  if(!earnedIds.length){
+    list.innerHTML='<div class="empty-state">Clear reward levels to unlock coupons.</div>';
+    return;
+  }
+  list.innerHTML=earnedIds.map(id=>{
+    const reward=REWARDS[id], used=state.rewards[id].used;
+    return `
+      <div class="rcard ${used?'used':''}">
+        <div class="ic">${reward.icon}</div>
+        <div style="flex:1">
+          <h4>${reward.title}</h4>
+          <small>${used?'Redeemed':reward.valid}</small>
+          <code>${reward.code}</code>
+        </div>
+        <button class="use" data-reward="${id}" ${used?'disabled':''}>${used?'USED':'USE'}</button>
+      </div>`;
+  }).join('');
+  list.querySelectorAll('[data-reward]').forEach(btn=>{
+    btn.onclick=()=>{
+      activeRewardId=btn.dataset.reward;
+      go('s-coupon');
+    };
+  });
+}
+function renderUnlockedReward(){
+  const id=justUnlockedReward || activeRewardId || Object.keys(state.rewards)[0];
+  const reward=REWARDS[id];
+  if(!reward) return;
+  document.getElementById('rewardTitle').textContent=reward.title.toUpperCase();
+  document.getElementById('rewardDesc').textContent=reward.desc;
+}
+function renderCoupon(id){
+  const reward=REWARDS[id] || REWARDS[Object.keys(state.rewards)[0]];
+  if(!reward) return;
+  activeRewardId=Object.keys(REWARDS).find(key=>REWARDS[key]===reward) || activeRewardId;
+  document.getElementById('couponTitle').textContent=reward.title.toUpperCase();
+  document.getElementById('couponCode').textContent=reward.code;
+  document.getElementById('couponValid').textContent=reward.valid;
+}
+function redeemActiveCoupon(){
+  if(activeRewardId && state.rewards[activeRewardId]){
+    state.rewards[activeRewardId].used=true;
+    state.rewards[activeRewardId].usedAt=new Date().toISOString();
+    saveState();
+    renderUsedCoupon(activeRewardId);
+  }
+}
+function renderUsedCoupon(id){
+  const reward=REWARDS[id];
+  if(!reward) return;
+  const usedAt=state.rewards[id] && state.rewards[id].usedAt ? new Date(state.rewards[id].usedAt) : new Date();
+  document.getElementById('usedTitle').textContent=reward.title.toUpperCase();
+  document.getElementById('usedCode').textContent=reward.code;
+  document.getElementById('usedDate').textContent='Redeemed '+usedAt.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+' · '+usedAt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+}
 
 /* ---------------- sound (tiny) ---------------- */
 let actx=null;
@@ -229,7 +423,7 @@ const TYPES=[
 const board=document.getElementById('board');
 let grid=[], busy=false, sel=null, moves=18, goal=15, score=0, armed=null;
 let boosters={shuffle:3,bomb:2,hammer:1};
-const TARGET=6000;
+let targetScore=6000;
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const cell=()=>board.clientWidth/C;
@@ -289,13 +483,14 @@ function matchesAt(g){
   return [...hit];
 }
 function buildBoard(){
+  const level=currentLevel();
   board.innerHTML='';
   grid=[];
   for(let r=0;r<R;r++){
     grid[r]=[];
     for(let c=0;c<C;c++){
       let t, tries=0;
-      do{ t=Math.floor(Math.random()*TYPES.length); tries++;
+      do{ t=Math.floor(Math.random()*level.types); tries++;
         grid[r][c]={type:t};
       }while(tries<20 && quickBad(r,c));
       grid[r][c]=makeTile(t);
@@ -311,7 +506,8 @@ function quickBad(r,c){
   return false;
 }
 function startLevel(){
-  moves=18; goal=15; score=0; sel=null; busy=false; armed=null;
+  const level=currentLevel();
+  moves=level.moves; goal=level.goal; targetScore=level.target; score=0; sel=null; busy=false; armed=null;
   boosters={shuffle:3,bomb:2,hammer:1};
   shownScore=0; clearHint();
   buildBoard(); syncHud();
@@ -332,7 +528,7 @@ function syncHud(){
   mv.closest('.pill').classList.toggle('warn', moves<=5 && goal>0);
   document.getElementById('goalLeft').textContent='x'+Math.max(0,goal);
   rollScore();
-  const p=Math.min(100, score/TARGET*100);
+  const p=Math.min(100, score/targetScore*100);
   document.getElementById('scoreFill').style.width=p+'%';
   litStar('st1', p>=33); litStar('st2', p>=66); litStar('st3', p>=97);
   cShuffle.textContent=boosters.shuffle; cBomb.textContent=boosters.bomb; cHammer.textContent=boosters.hammer;
@@ -565,7 +761,7 @@ function dropAndFill(){
       }
     }
     for(let r=write;r>=0;r--){
-      const o=makeTile(Math.floor(Math.random()*TYPES.length));
+      const o=makeTile(Math.floor(Math.random()*currentLevel().types));
       place(o, r-R, c, true);
       grid[r][c]=o;
       requestAnimationFrame(()=>requestAnimationFrame(()=>place(o,r,c)));
@@ -602,13 +798,33 @@ async function checkEnd(){
   scheduleHint();
 }
 function levelClear(){
-  const stars = score>=TARGET?3 : score>=TARGET*.66?2 : 1;
+  const level=currentLevel();
+  const stars = score>=targetScore?3 : score>=targetScore*.66?2 : 1;
+  state.stars[level.n]=Math.max(state.stars[level.n]||0, stars);
+  justUnlockedReward=null;
+  if(level.reward && !state.rewards[level.reward]){
+    state.rewards[level.reward]={earned:true,used:false,earnedAt:new Date().toISOString()};
+    justUnlockedReward=level.reward;
+    activeRewardId=level.reward;
+  }
+  const next=LEVELS.find(l=>l.n>level.n);
+  if(next && level.n>=state.unlockedLevel){
+    state.unlockedLevel=Math.max(state.unlockedLevel,next.n);
+    state.currentLevel=next.n;
+  }else if(level.n<state.unlockedLevel){
+    state.currentLevel=state.unlockedLevel;
+  }
+  saveState();
+  renderProgress();
   const row=document.getElementById('clearStars');
   [...row.children].forEach((s,i)=>s.classList.toggle('on', i<stars));
   document.getElementById('clearScore').textContent=score.toLocaleString();
   document.getElementById('clearMsg').textContent = stars===3
-    ? 'Perfect run. Two levels to your free topping.'
-    : 'Level cleared. Two levels to your free topping.';
+    ? 'Perfect run. Your progress is saved.'
+    : 'Level cleared. Your progress is saved.';
+  const btn=document.getElementById('clearNext');
+  btn.dataset.go=justUnlockedReward ? 's-reward' : 's-home';
+  btn.textContent=justUnlockedReward ? 'UNLOCK REWARD ▶' : 'NEXT LEVEL ▶';
   document.getElementById('ovClear').classList.add('on');
   confettiBurst();
   [880,1100,1320].forEach((f,i)=>setTimeout(()=>blip(f,.14,'triangle',.05), i*130));

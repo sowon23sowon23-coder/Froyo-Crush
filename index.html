@@ -63,10 +63,10 @@
     <div class="hero-card">
       <div class="hero-row">
         <div class="pill"><div class="k">Level</div><div class="v" id="homeLevel">04</div></div>
-        <div class="pill"><div class="k">Next reward</div><div class="v" style="font-size:15px;line-height:1.15">Free<br>topping 🍓</div></div>
+        <div class="pill"><div class="k">Next reward</div><div class="v" id="homeReward" style="font-size:15px;line-height:1.15">Free<br>topping 🍓</div></div>
       </div>
       <div class="prog"><i id="homeProg"></i></div>
-      <div class="hero-note">Clear <b>2 more levels</b> to unlock it</div>
+      <div class="hero-note" id="homeNote">Clear <b>2 more levels</b> to unlock it</div>
     </div>
     <div style="padding:18px 16px 0">
       <button class="btn gold" data-go="s-game" style="font-size:24px">PLAY ▶</button>
@@ -91,8 +91,8 @@
       <div style="font-size:30px">🍨</div>
       <div style="flex:1">
         <div style="font-size:9px;font-weight:800;letter-spacing:1.2px;color:#B9829B">NEXT REWARD</div>
-        <div style="font-family:var(--display);font-size:16px;color:var(--magenta);line-height:1.1">Free topping</div>
-        <div style="font-size:10px;color:#9E7387;font-weight:500">Clear 2 more levels</div>
+        <div id="mapRewardTitle" style="font-family:var(--display);font-size:16px;color:var(--magenta);line-height:1.1">Free topping</div>
+        <div id="mapRewardNote" style="font-size:10px;color:#9E7387;font-weight:500">Clear 2 more levels</div>
       </div>
       <button class="use" data-go="s-game">PLAY</button>
     </div>
@@ -101,7 +101,7 @@
   <!-- 05 GAME -->
   <section class="screen" id="s-game" data-name="05 Game (playable)">
     <div class="hud">
-      <div class="pill"><div class="k">Level</div><div class="v">04</div></div>
+      <div class="pill"><div class="k">Level</div><div class="v" id="gameLevel">04</div></div>
       <div class="pill"><div class="k">Goal</div><div class="v goal"><em>🍓</em><span id="goalLeft">15</span></div></div>
       <div class="pill"><div class="k">Moves</div><div class="v" id="movesLeft">18</div></div>
     </div>
@@ -129,13 +129,13 @@
     <!-- overlays -->
     <div class="ov" id="ovClear">
       <div class="card">
-        <div class="klabel">Level 04</div>
+        <div class="klabel" id="clearLevel">Level 04</div>
         <h3>LEVEL COMPLETE!</h3>
         <div class="starrow" id="clearStars"><span>⭐</span><span>⭐</span><span>⭐</span></div>
         <div class="klabel">Score</div>
         <div class="bigscore" id="clearScore">0</div>
         <p id="clearMsg">Sweet run. Two levels to your free topping.</p>
-        <button class="btn lime" data-go="s-reward">NEXT ▶</button>
+        <button class="btn lime" id="clearNext" data-go="s-home">NEXT ▶</button>
       </div>
     </div>
     <div class="ov" id="ovFail">
@@ -156,8 +156,8 @@
       <div class="rays"></div>
       <div class="klabel">You unlocked</div>
       <div class="giftbox">🎁</div>
-      <h3 style="margin-top:8px">FREE TOPPING</h3>
-      <p>On any regular cup. Valid until Sep 30, 2026 at any Yogurtland store.</p>
+      <h3 id="rewardTitle" style="margin-top:8px">FREE TOPPING</h3>
+      <p id="rewardDesc">On any regular cup. Valid until Sep 30, 2026 at any Yogurtland store.</p>
       <button class="btn gold" data-go="s-rewards">CLAIM COUPON</button>
     </div>
   </section>
@@ -165,25 +165,8 @@
   <!-- 08 REWARDS -->
   <section class="screen" id="s-rewards" data-name="08 My rewards">
     <div class="topbar"><button class="back" data-go="s-home">‹</button><h2>MY REWARDS</h2></div>
-    <div class="segs"><button class="on">AVAILABLE (2)</button><button>REDEEMED (1)</button></div>
-    <div class="rcard">
-      <div class="ic">🍓</div>
-      <div style="flex:1">
-        <h4>Free topping</h4>
-        <small>Valid until Sep 30, 2026</small>
-        <code>YL-A8F92K</code>
-      </div>
-      <button class="use" data-go="s-coupon">USE</button>
-    </div>
-    <div class="rcard">
-      <div class="ic">🍨</div>
-      <div style="flex:1">
-        <h4>10% off any cup</h4>
-        <small>Valid until Oct 31, 2026</small>
-        <code>YL-C7D34M</code>
-      </div>
-      <button class="use" data-go="s-coupon">USE</button>
-    </div>
+    <div class="segs"><button class="on" id="availableCount">AVAILABLE (0)</button><button id="redeemedCount">REDEEMED (0)</button></div>
+    <div id="rewardList"></div>
     <div style="margin:6px 18px 0;padding:12px 14px;border-radius:18px;background:rgba(193,15,94,.08);font-size:11px;color:#8C5A72;font-weight:500;line-height:1.5">
       🏪 Show the coupon screen at the counter. Staff taps <b>Mark as redeemed</b> — one use per coupon.
     </div>
@@ -195,14 +178,14 @@
     <div style="width:100%;padding:0 18px 6px"><button class="back" data-go="s-rewards">‹</button></div>
     <div class="ticket">
       <div class="logo" style="font-size:17px">Yogurtland<small>get real.</small></div>
-      <h3 style="font-family:var(--display);font-size:27px;color:var(--magenta);margin:10px 0 0">FREE TOPPING</h3>
+      <h3 id="couponTitle" style="font-family:var(--display);font-size:27px;color:var(--magenta);margin:10px 0 0">FREE TOPPING</h3>
       <div class="qr"><i></i></div>
       <div class="klabel">Coupon code</div>
-      <div class="ccode">YL-A8F92K</div>
-      <div style="font-size:11px;color:#9E7387;margin-top:8px;font-weight:500">Valid until Sep 30, 2026</div>
+      <div class="ccode" id="couponCode">YL-A8F92K</div>
+      <div id="couponValid" style="font-size:11px;color:#9E7387;margin-top:8px;font-weight:500">Valid until Sep 30, 2026</div>
     </div>
     <p style="font-size:11.5px;color:#8C5A72;font-weight:600;margin:16px 0 10px">Hand your phone to the staff</p>
-    <div style="width:100%;padding:0 26px"><button class="btn" data-go="s-used">MARK AS REDEEMED</button></div>
+    <div style="width:100%;padding:0 26px"><button class="btn" id="redeemCoupon" data-go="s-used">MARK AS REDEEMED</button></div>
   </section>
 
   <!-- 09-1 USED -->
@@ -210,10 +193,10 @@
     <div style="width:100%;padding:0 18px 6px"><button class="back" style="background:rgba(255,255,255,.15);color:#fff" data-go="s-rewards">‹</button></div>
     <div class="ticket">
       <div class="logo" style="font-size:17px;color:#fff;opacity:.6">Yogurtland<small style="color:#fff">get real.</small></div>
-      <h3 style="font-family:var(--display);font-size:27px;color:#fff;opacity:.6;margin:10px 0 0">FREE TOPPING</h3>
+      <h3 id="usedTitle" style="font-family:var(--display);font-size:27px;color:#fff;opacity:.6;margin:10px 0 0">FREE TOPPING</h3>
       <div class="qr" style="background:#5A4450;box-shadow:inset 0 0 0 3px rgba(255,255,255,.3);opacity:.35"><i></i></div>
-      <div class="ccode" style="color:#fff;opacity:.5">YL-A8F92K</div>
-      <div style="font-size:11px;opacity:.6;margin-top:8px">Redeemed Aug 29, 2026 · 6:24 PM</div>
+      <div class="ccode" id="usedCode" style="color:#fff;opacity:.5">YL-A8F92K</div>
+      <div id="usedDate" style="font-size:11px;opacity:.6;margin-top:8px">Redeemed Aug 29, 2026 · 6:24 PM</div>
       <div class="stamp"><span>REDEEMED ✓</span></div>
     </div>
     <p style="font-size:12px;opacity:.75;margin-top:20px">This coupon has already been used.</p>
