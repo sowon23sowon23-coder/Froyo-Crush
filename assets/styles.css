@@ -49,6 +49,12 @@ body{
   box-shadow:0 0 0 10px #1B0310, 0 0 0 12px rgba(255,255,255,.09), 0 40px 80px rgba(0,0,0,.6);
   flex:none;
 }
+@media(min-width:431px) and (max-height:860px){
+  .phone{
+    height:calc(100dvh - 36px);
+    width:min(390px, calc((100dvh - 36px) * .4875));
+  }
+}
 @media(max-width:430px){
   body{padding:0;background:#1B0310}
   .phone{
@@ -162,7 +168,7 @@ body{
 
 /* ---------- 04 map ---------- */
 #s-map{background:linear-gradient(#CFEBFF 0%, #E9F7D9 55%, #FFF1DC 100%);overflow:hidden}
-.map-scroll{flex:1;position:relative;overflow-y:auto;padding:6px 0 130px}
+.map-scroll{flex:1;position:relative;overflow-y:auto;padding:6px 0 150px;min-height:0}
 .cloud{position:absolute;background:rgba(255,255,255,.75);border-radius:99px;filter:blur(.4px)}
 .path{position:absolute;inset:0;width:100%;height:100%}
 .node{
@@ -177,7 +183,7 @@ body{
 .stars{position:absolute;transform:translate(-50%,-50%);font-size:12px;letter-spacing:-1px;white-space:nowrap}
 .gift{position:absolute;transform:translate(-50%,-50%);font-size:22px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.25));animation:bob 2.2s ease-in-out infinite}
 .youhere{position:absolute;transform:translate(-50%,-50%);background:#fff;color:var(--magenta);font-size:9px;font-weight:800;padding:5px 9px;border-radius:99px;box-shadow:0 3px 0 rgba(59,6,32,.16);letter-spacing:.6px;white-space:nowrap}
-.map-foot{position:absolute;left:14px;right:14px;bottom:16px;background:#fff;border-radius:22px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 7px 0 rgba(59,6,32,.14)}
+.map-foot{position:absolute;left:14px;right:14px;bottom:18px;background:#fff;border-radius:22px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 7px 0 rgba(59,6,32,.14);z-index:5}
 
 /* ---------- 05 game ---------- */
 #s-game{
@@ -393,3 +399,10 @@ body{
 .footnote{max-width:760px;text-align:center;font-size:11.5px;line-height:1.7;color:#FFC7DC;opacity:.8}
 .footnote b{color:var(--gold)}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition-duration:.05s!important}}
+@media(min-width:431px) and (max-height:760px){
+  .topbar{padding-top:32px}
+  #swirlMap{width:360px;height:640px;transform:scale(.92);transform-origin:top center;margin-bottom:-52px}
+  #swirlMap svg{width:360px;height:640px}
+  .map-scroll{padding-bottom:142px}
+  .map-foot{bottom:12px}
+}
