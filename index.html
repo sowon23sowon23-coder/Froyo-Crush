@@ -76,6 +76,7 @@
       <button class="tile-btn" data-go="s-rewards"><i>🎁</i>MY REWARDS</button>
       <button class="tile-btn" data-go="s-how"><i>❓</i>HOW TO PLAY</button>
       <button class="tile-btn" data-go="s-staff"><i>✓</i>STAFF</button>
+      <button class="tile-btn" data-go="s-history"><i>◷</i>HISTORY</button>
       <button class="tile-btn" data-go="s-settings"><i>⚙</i>SETTINGS</button>
     </div>
     <nav class="tabbar"><button class="on"><i>🏠</i>HOME</button><button data-go="s-rewards"><i>🎁</i>REWARDS</button><button data-go="s-how"><i>❓</i>HOW TO PLAY</button></nav>
@@ -104,7 +105,7 @@
   <section class="screen" id="s-game" data-name="05 Game (playable)">
     <div class="hud">
       <div class="pill"><div class="k">Level</div><div class="v" id="gameLevel">04</div></div>
-      <div class="pill"><div class="k">Goal</div><div class="v goal"><em>🍓</em><span id="goalLeft">15</span></div></div>
+      <div class="pill"><div class="k" id="goalLabel">Goal</div><div class="v goal"><em id="goalIcon">🍓</em><span id="goalLeft">15</span></div></div>
       <div class="pill"><div class="k">Moves</div><div class="v" id="movesLeft">18</div></div>
     </div>
     <div class="scorebar">
@@ -117,6 +118,12 @@
     <div class="boardwrap">
       <div class="board" id="board"></div>
       <div class="combo" id="combo"></div>
+      <div class="tutorial" id="tutorial">
+        <div class="gesture"></div>
+        <b>Slide a topping</b>
+        <span>Drag one tile into a neighbor to make a match.</span>
+        <button type="button" id="tutorialOk">GOT IT</button>
+      </div>
     </div>
     <div class="banner" id="banner"></div>
     <div class="flash" id="flash"></div>
@@ -144,7 +151,9 @@
       <div class="card">
         <h3 style="color:var(--berry-700)">OUT OF MOVES</h3>
         <div style="font-size:56px;margin:6px 0">🍨</div>
-        <p>You needed <b id="failLeft">4</b> more strawberries. Try a different first match.</p>
+        <p id="failText">You needed <b id="failLeft">4</b> more strawberries. Try a different first match.</p>
+        <button class="btn lime" id="extraMoves">ADD 5 MOVES</button>
+        <button class="btn ghost" id="failShuffle" style="margin-top:8px;color:var(--berry-700);background:rgba(168,216,75,.18);box-shadow:0 3px 0 rgba(111,163,28,.25)">SHUFFLE BOARD</button>
         <button class="btn" id="retry">TRY AGAIN</button>
         <button class="btn ghost" data-go="s-home" style="margin-top:8px;color:var(--magenta);background:rgba(193,15,94,.1);box-shadow:0 3px 0 rgba(193,15,94,.2)">BACK TO HOME</button>
       </div>
@@ -182,9 +191,11 @@
       <div class="logo" style="font-size:17px">Yogurtland<small>get real.</small></div>
       <h3 id="couponTitle" style="font-family:var(--display);font-size:27px;color:var(--magenta);margin:10px 0 0">FREE TOPPING</h3>
       <div class="qr"><i></i></div>
+      <div class="secure-strip"><span></span> VERIFIED COUPON</div>
       <div class="klabel">Coupon code</div>
       <div class="ccode" id="couponCode">YL-A8F92K</div>
       <div id="couponValid" style="font-size:11px;color:#9E7387;margin-top:8px;font-weight:500">Valid until Sep 30, 2026</div>
+      <div class="coupon-status" id="couponStatus">Ready for staff scan</div>
     </div>
     <p style="font-size:11.5px;color:#8C5A72;font-weight:600;margin:16px 0 10px">Hand your phone to the staff</p>
     <div style="width:100%;padding:0 26px"><button class="btn" id="redeemCoupon" data-go="s-used">MARK AS REDEEMED</button></div>
@@ -270,6 +281,13 @@
       <button class="btn ghost" id="resetProgress">RESET PROGRESS</button>
     </div>
     <nav class="tabbar"><button data-go="s-home"><i>🏠</i>HOME</button><button data-go="s-rewards"><i>🎁</i>REWARDS</button><button class="on"><i>⚙</i>SETTINGS</button></nav>
+  </section>
+
+  <!-- 13 HISTORY -->
+  <section class="screen" id="s-history" data-name="13 History">
+    <div class="topbar"><button class="back" data-go="s-home">‹</button><h2>HISTORY</h2></div>
+    <div class="history-list" id="historyList"></div>
+    <nav class="tabbar"><button data-go="s-home"><i>🏠</i>HOME</button><button data-go="s-rewards"><i>🎁</i>REWARDS</button><button data-go="s-settings"><i>⚙</i>SETTINGS</button></nav>
   </section>
 </div>
 

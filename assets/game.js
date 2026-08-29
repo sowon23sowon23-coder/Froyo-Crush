@@ -1,13 +1,13 @@
 /* ---------------- screen router ---------------- */
 const screens=[...document.querySelectorAll('.screen')];
 const LEVELS=[
-  {n:4,name:'Berry Blast',goal:15,moves:18,target:6000,types:6},
-  {n:5,name:'Kiwi Rush',goal:18,moves:20,target:7600,types:6},
-  {n:6,name:'Topping Sprint',goal:20,moves:19,target:9000,types:6,reward:'free-topping'},
-  {n:7,name:'Mango Pop',goal:22,moves:18,target:10600,types:6},
-  {n:8,name:'Froyo Fever',goal:24,moves:17,target:12400,types:6,reward:'discount'},
-  {n:9,name:'Crunch Time',goal:26,moves:17,target:14200,types:6},
-  {n:10,name:'Cup Finale',goal:30,moves:16,target:16800,types:6,reward:'free-cup'}
+  {n:4,name:'Berry Blast',mode:'collect',targetType:0,goal:15,moves:18,target:6000,types:6},
+  {n:5,name:'Kiwi Rush',mode:'collect',targetType:2,goal:18,moves:20,target:7600,types:6},
+  {n:6,name:'Chocolate Drop',mode:'collect',targetType:4,goal:20,moves:19,target:9000,types:6,reward:'free-topping'},
+  {n:7,name:'Mango Pop',mode:'collect',targetType:3,goal:22,moves:18,target:10600,types:6},
+  {n:8,name:'Mochi Mix',mode:'collect',targetType:5,goal:24,moves:17,target:12400,types:6,reward:'discount'},
+  {n:9,name:'Score Sprint',mode:'score',goal:14000,moves:17,target:14000,types:6},
+  {n:10,name:'Cup Finale',mode:'collect',targetType:0,goal:30,moves:16,target:16800,types:6,reward:'free-cup'}
 ];
 const REWARDS={
   'free-topping':{title:'Free topping',desc:'On any regular cup. Valid until Sep 30, 2026 at any Yogurtland store.',code:'YL-A8F92K',valid:'Valid until Sep 30, 2026',icon:'🍓'},
@@ -30,6 +30,7 @@ function go(id){
   if(id==='s-reward') renderUnlockedReward();
   if(id==='s-staff') renderStaffReady();
   if(id==='s-settings') renderSettings();
+  if(id==='s-history') renderHistory();
   if(id==='s-game') startLevel();
   if(id==='s-map') buildMap();
 }
@@ -48,18 +49,38 @@ function loadState(){
       unlockedLevel:Math.max(4,saved.unlockedLevel||4),
       stars:saved.stars||{},
       rewards:saved.rewards||{},
+      history:saved.history||[],
+      seenTutorial:!!saved.seenTutorial,
       settings:Object.assign({sound:true,vibration:true,reducedMotion:false}, saved.settings||{})
     };
   }catch(e){
-    return {currentLevel:4,unlockedLevel:4,stars:{},rewards:{},settings:{sound:true,vibration:true,reducedMotion:false}};
+    return {currentLevel:4,unlockedLevel:4,stars:{},rewards:{},history:[],seenTutorial:false,settings:{sound:true,vibration:true,reducedMotion:false}};
   }
 }
 function saveState(){ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
 function applySettings(){ document.body.classList.toggle('reduce-motion', !!state.settings.reducedMotion); }
+function addHistory(type,text){
+  state.history=[{type,text,at:new Date().toISOString()},...(state.history||[])].slice(0,20);
+  saveState();
+}
 function levelFor(n){ return LEVELS.find(l=>l.n===n) || LEVELS[LEVELS.length-1]; }
 function currentLevel(){ return levelFor(Math.min(state.currentLevel, state.unlockedLevel)); }
 function nextReward(){
   return LEVELS.find(l=>l.n>=state.unlockedLevel && l.reward && !state.rewards[l.reward]);
+}
+function isGoalComplete(){ return currentLevel().mode==='score' ? score>=targetScore : goal<=0; }
+function goalHits(hits){
+  const level=currentLevel();
+  return level.mode==='collect' ? hits.filter(t=>t.type===level.targetType) : [];
+}
+function goalText(){
+  const level=currentLevel();
+  if(level.mode==='score') return Math.max(0,targetScore-score).toLocaleString();
+  return 'x'+Math.max(0,goal);
+}
+function goalIcon(){
+  const level=currentLevel();
+  return level.mode==='score' ? '★' : TYPES[level.targetType].e;
 }
 
 /* ---------------- splash sprinkles ---------------- */
@@ -291,11 +312,15 @@ function renderCoupon(id){
   document.getElementById('couponTitle').textContent=reward.title.toUpperCase();
   document.getElementById('couponCode').textContent=reward.code;
   document.getElementById('couponValid').textContent=reward.valid;
+  const saved=state.rewards[activeRewardId];
+  document.getElementById('couponStatus').textContent=saved && saved.used ? 'Already redeemed' : 'Ready for staff scan';
 }
 function redeemActiveCoupon(){
   if(activeRewardId && state.rewards[activeRewardId]){
+    const wasUsed=state.rewards[activeRewardId].used;
     state.rewards[activeRewardId].used=true;
     state.rewards[activeRewardId].usedAt=new Date().toISOString();
+    if(!wasUsed) addHistory('redeem','Redeemed '+REWARDS[activeRewardId].title);
     saveState();
     renderUsedCoupon(activeRewardId);
   }
@@ -349,6 +374,7 @@ function staffRedeemCoupon(){
   if(!staffRewardId || !state.rewards[staffRewardId]) return;
   state.rewards[staffRewardId].used=true;
   state.rewards[staffRewardId].usedAt=new Date().toISOString();
+  addHistory('staff','Staff redeemed '+REWARDS[staffRewardId].title);
   saveState();
   setStaffResult('ok','Redeemed',REWARDS[staffRewardId].title+' is now marked as used.');
   document.getElementById('staffRedeem').disabled=true;
@@ -368,7 +394,7 @@ function updateSetting(key,value){
   document.getElementById('settingsNote').textContent='Settings saved on this device.';
 }
 function resetProgress(){
-  state={currentLevel:4,unlockedLevel:4,stars:{},rewards:{},settings:state.settings};
+  state={currentLevel:4,unlockedLevel:4,stars:{},rewards:{},history:[],seenTutorial:false,settings:state.settings};
   activeRewardId=null;
   justUnlockedReward=null;
   staffRewardId=null;
@@ -377,6 +403,25 @@ function resetProgress(){
   renderRewards();
   renderSettings();
   document.getElementById('settingsNote').textContent='Progress reset. Settings were kept.';
+}
+function renderHistory(){
+  const list=document.getElementById('historyList');
+  const items=state.history||[];
+  if(!items.length){
+    list.innerHTML='<div class="empty-state">Play levels or redeem coupons to build history.</div>';
+    return;
+  }
+  list.innerHTML=items.map(item=>{
+    const at=new Date(item.at);
+    const stamp=at.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' · '+at.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+    return `<div class="history-item"><i>${historyIcon(item.type)}</i><div><h4>${item.text}</h4><small>${stamp}</small></div></div>`;
+  }).join('');
+}
+function historyIcon(type){
+  if(type==='reward') return '🎁';
+  if(type==='redeem'||type==='staff') return '✓';
+  if(type==='help') return '+';
+  return '★';
 }
 
 /* ---------------- sound (tiny) ---------------- */
@@ -504,6 +549,9 @@ let targetScore=6000;
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const cell=()=>board.clientWidth/C;
+function typeName(type){
+  return ['strawberries','blueberries','kiwis','mangoes','chocolates','mochi'][type] || 'toppings';
+}
 
 function makeTile(type, special=null){
   const t=TYPES[type];
@@ -591,6 +639,20 @@ function startLevel(){
   document.querySelectorAll('.ov').forEach(o=>o.classList.remove('on'));
   document.querySelectorAll('.st').forEach(s=>s.classList.remove('on','burst'));
   scheduleHint();
+  maybeShowTutorial();
+}
+function maybeShowTutorial(){
+  const t=document.getElementById('tutorial');
+  if(!t) return;
+  t.classList.toggle('on', !state.seenTutorial);
+}
+function completeTutorial(){
+  const t=document.getElementById('tutorial');
+  if(t) t.classList.remove('on');
+  if(!state.seenTutorial){
+    state.seenTutorial=true;
+    saveState();
+  }
 }
 function litStar(id,on){
   const el=document.getElementById(id);
@@ -602,8 +664,10 @@ function litStar(id,on){
 function syncHud(){
   const mv=document.getElementById('movesLeft');
   mv.textContent=moves;
-  mv.closest('.pill').classList.toggle('warn', moves<=5 && goal>0);
-  document.getElementById('goalLeft').textContent='x'+Math.max(0,goal);
+  mv.closest('.pill').classList.toggle('warn', moves<=5 && !isGoalComplete());
+  document.getElementById('goalLabel').textContent=currentLevel().mode==='score' ? 'Score left' : 'Goal';
+  document.getElementById('goalIcon').textContent=goalIcon();
+  document.getElementById('goalLeft').textContent=goalText();
   rollScore();
   const p=Math.min(100, score/targetScore*100);
   document.getElementById('scoreFill').style.width=p+'%';
@@ -643,6 +707,7 @@ board.addEventListener('pointerup',e=>{
   const dx=e.clientX-down.x, dy=e.clientY-down.y;
   down.o.el.classList.remove('dragging');
   if(Math.abs(dx)>16||Math.abs(dy)>16){
+    completeTutorial();
     const o=down.o;
     let r=o.r,c=o.c;
     if(Math.abs(dx)>Math.abs(dy)) c+= dx>0?1:-1; else r+= dy>0?1:-1;
@@ -699,17 +764,17 @@ async function resolve(){
     if(!hits.length) break;
     combo++;
     if(combo>1) showCombo(combo);
-    const straws=hits.filter(t=>TYPES[t.type].k==='straw');
-    const wasOpen=goal>0;
-    goal-=straws.length;
+    const collected=goalHits(hits);
+    const wasOpen=!isGoalComplete();
+    goal-=collected.length;
     const pts=hits.length*40*combo;
     score+=pts;
     blip(440+combo*110,.09,'triangle',.05);
     buzz(combo>=3?26:10);
     if(combo>=3){ flashScreen(); shake(); }
     shockwave(hits);
-    straws.forEach((t,i)=>flyToGoal(t, i*70));
-    if(wasOpen && goal<=0) setTimeout(()=>{ showBanner('GOAL COMPLETE!'); blip(1320,.2,'triangle',.06) }, 260);
+    collected.forEach((t,i)=>flyToGoal(t, i*70));
+    if(wasOpen && isGoalComplete()) setTimeout(()=>{ showBanner('GOAL COMPLETE!'); blip(1320,.2,'triangle',.06) }, 260);
     popTiles(hits, pts);
     hits.forEach(t=>{ grid[t.r][t.c]=null; });
     specials.forEach(({tile, special})=>{
@@ -782,12 +847,12 @@ function expandSpecialHits(hits){
 }
 async function clearSpecials(specials){
   const hits=expandSpecialHits(specials);
-  const straws=hits.filter(t=>TYPES[t.type].k==='straw');
-  const wasOpen=goal>0;
-  goal-=straws.length;
+  const collected=goalHits(hits);
+  const wasOpen=!isGoalComplete();
+  goal-=collected.length;
   const pts=hits.length*55;
   score+=pts;
-  straws.forEach((t,i)=>flyToGoal(t, i*65));
+  collected.forEach((t,i)=>flyToGoal(t, i*65));
   popTiles(hits, pts);
   hits.forEach(t=>{ grid[t.r][t.c]=null; });
   syncHud();
@@ -795,7 +860,7 @@ async function clearSpecials(specials){
   hits.forEach(t=>t.el.remove());
   dropAndFill();
   await sleep(260);
-  if(wasOpen && goal<=0) showBanner('GOAL COMPLETE!');
+  if(wasOpen && isGoalComplete()) showBanner('GOAL COMPLETE!');
   await resolve();
 }
 function popTiles(hits, pts){
@@ -859,9 +924,11 @@ function shake(){
 
 async function checkEnd(){
   clearHint();
-  if(goal<=0){ setTimeout(levelClear,760); return; }
+  if(isGoalComplete()){ setTimeout(levelClear,760); return; }
   if(moves<=0){
-    document.getElementById('failLeft').textContent=goal;
+    const level=currentLevel();
+    const left=level.mode==='score' ? Math.max(0,targetScore-score).toLocaleString()+' points' : Math.max(0,goal)+' more '+typeName(level.targetType);
+    document.getElementById('failText').innerHTML='You needed <b id="failLeft">'+left+'</b>. Try a booster or one more run.';
     blip(160,.4,'sawtooth',.05); buzz([30,60,30]);
     setTimeout(()=>document.getElementById('ovFail').classList.add('on'),380);
     return;
@@ -878,11 +945,13 @@ function levelClear(){
   const level=currentLevel();
   const stars = score>=targetScore?3 : score>=targetScore*.66?2 : 1;
   state.stars[level.n]=Math.max(state.stars[level.n]||0, stars);
+  addHistory('level','Cleared Level '+level.n+' with '+stars+' star'+(stars===1?'':'s'));
   justUnlockedReward=null;
   if(level.reward && !state.rewards[level.reward]){
     state.rewards[level.reward]={earned:true,used:false,earnedAt:new Date().toISOString()};
     justUnlockedReward=level.reward;
     activeRewardId=level.reward;
+    addHistory('reward','Unlocked '+REWARDS[level.reward].title);
   }
   const next=LEVELS.find(l=>l.n>level.n);
   if(next && level.n>=state.unlockedLevel){
@@ -920,6 +989,24 @@ function confettiBurst(){
 }
 document.getElementById('retry').onclick=startLevel;
 document.getElementById('boReset').onclick=startLevel;
+document.getElementById('extraMoves').onclick=()=>{
+  moves+=5;
+  document.getElementById('ovFail').classList.remove('on');
+  syncHud();
+  showBanner('+5 MOVES!');
+  addHistory('help','Used +5 moves on Level '+currentLevel().n);
+  scheduleHint();
+};
+document.getElementById('failShuffle').onclick=async()=>{
+  document.getElementById('ovFail').classList.remove('on');
+  busy=true;
+  await shuffleBoard();
+  await resolve();
+  busy=false;
+  addHistory('help','Shuffled after failing Level '+currentLevel().n);
+  checkEnd();
+};
+document.getElementById('tutorialOk').onclick=completeTutorial;
 document.getElementById('staffCheck').onclick=checkStaffCode;
 document.getElementById('staffRedeem').onclick=staffRedeemCoupon;
 document.getElementById('staffCode').addEventListener('keydown',e=>{ if(e.key==='Enter') checkStaffCode(); });
@@ -956,7 +1043,7 @@ async function useArmed(o){
     blip(110,.3,'sawtooth',.06); shake();
   }
   hits=expandSpecialHits(hits);
-  goal-=hits.filter(t=>TYPES[t.type].k==='straw').length;
+  goal-=goalHits(hits).length;
   score+=hits.length*30;
   popTiles(hits, hits.length*30);
   hits.forEach(t=>grid[t.r][t.c]=null);
