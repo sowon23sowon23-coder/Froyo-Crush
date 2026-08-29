@@ -347,19 +347,43 @@ board.addEventListener('pointerdown',e=>{
   const el=e.target.closest('.tile'); if(!el||busy) return;
   clearHint();
   const o=find(el); if(!o) return;
-  down={o,x:e.clientX,y:e.clientY};
+  down={o,x:e.clientX,y:e.clientY,drag:false};
+  el.setPointerCapture && el.setPointerCapture(e.pointerId);
   if(armed){ useArmed(o); down=null; return; }
-  if(sel && sel!==o && adjacent(sel,o)){ const a=sel; clearSel(); trySwap(a,o); down=null; return; }
   clearSel(); sel=o; o.el.classList.add('sel');
+});
+board.addEventListener('pointermove',e=>{
+  if(!down||busy) return;
+  const dx=e.clientX-down.x, dy=e.clientY-down.y;
+  const dist=Math.hypot(dx,dy);
+  if(dist<6) return;
+  down.drag=true;
+  const o=down.o, s=cell(), max=s*.82;
+  let tx=0, ty=0;
+  if(Math.abs(dx)>Math.abs(dy)) tx=Math.max(-max,Math.min(max,dx));
+  else ty=Math.max(-max,Math.min(max,dy));
+  o.el.classList.add('dragging');
+  o.el.style.transform=`translate(${o.c*s+s*0.07}px, ${o.r*s+s*0.07}px) translate(${tx}px, ${ty}px)`;
 });
 board.addEventListener('pointerup',e=>{
   if(!down||busy){down=null;return}
   const dx=e.clientX-down.x, dy=e.clientY-down.y;
+  down.o.el.classList.remove('dragging');
   if(Math.abs(dx)>16||Math.abs(dy)>16){
     const o=down.o;
     let r=o.r,c=o.c;
     if(Math.abs(dx)>Math.abs(dy)) c+= dx>0?1:-1; else r+= dy>0?1:-1;
     if(grid[r]&&grid[r][c]){ clearSel(); trySwap(o,grid[r][c]); }
+    else place(o,o.r,o.c);
+  }else{
+    place(down.o,down.o.r,down.o.c);
+  }
+  down=null;
+});
+board.addEventListener('pointercancel',()=>{
+  if(down){
+    down.o.el.classList.remove('dragging');
+    place(down.o,down.o.r,down.o.c);
   }
   down=null;
 });

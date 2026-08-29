@@ -202,11 +202,11 @@ body{
   box-shadow:0 9px 0 rgba(0,0,0,.4), inset 0 0 0 3px rgba(193,15,94,.14), 0 20px 40px rgba(0,0,0,.45);
 }
 .board{position:relative;width:100%;aspect-ratio:1;border-radius:18px;overflow:hidden;background:
-  repeating-conic-gradient(rgba(193,15,94,.05) 0% 25%, rgba(193,15,94,.02) 0% 50%) 0 0/ 25% 25%;}
+  repeating-conic-gradient(rgba(193,15,94,.05) 0% 25%, rgba(193,15,94,.02) 0% 50%) 0 0/ 25% 25%;touch-action:none}
 .tile{
   position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;
   font-size:20px;cursor:pointer;transition:transform .18s cubic-bezier(.3,1.4,.5,1);
-  will-change:transform;
+  will-change:transform;touch-action:none;
 }
 .tile .body{position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 -5px 8px rgba(0,0,0,.28), inset 0 4px 6px rgba(255,255,255,.55), 0 4px 6px rgba(0,0,0,.28)}
 .tile .gloss{position:absolute;top:12%;left:16%;width:32%;height:24%;border-radius:50%;background:rgba(255,255,255,.75);filter:blur(1px)}
@@ -226,9 +226,9 @@ body{
   box-shadow:inset 0 -5px 8px rgba(0,0,0,.28), inset 0 4px 6px rgba(255,255,255,.55), 0 0 0 3px rgba(255,201,60,.88), 0 0 18px rgba(255,201,60,.9);
 }
 .tile.special-bomb em{color:#fff;font-size:1.1em;text-shadow:0 0 8px rgba(255,201,60,.95)}
-.tile.sel{animation:wiggle .4s infinite}
+.tile.sel{z-index:8}
 .tile.sel .body{box-shadow:inset 0 -5px 8px rgba(0,0,0,.28), inset 0 4px 6px rgba(255,255,255,.55), 0 0 0 3px #fff, 0 0 16px 4px var(--gold)}
-@keyframes wiggle{0%,100%{rotate:-7deg}50%{rotate:7deg}}
+.tile.dragging{z-index:9;transition:none}
 .tile.pop{animation:popout .26s forwards}
 @keyframes popout{0%{scale:1}45%{scale:1.32}100%{scale:0;opacity:0}}
 @keyframes pop{0%{transform:scale(.5)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
