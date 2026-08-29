@@ -445,7 +445,10 @@ async function resolve(){
       tile.el.classList.remove('pop');
       paintTile(tile);
       grid[tile.r][tile.c]=tile;
-      tile.el.animate([{scale:.55, rotate:'-12deg'},{scale:1.18, rotate:'8deg'},{scale:1, rotate:'0deg'}],{duration:420,easing:'cubic-bezier(.2,1.5,.4,1)'});
+      tile.el.querySelector('.body').animate(
+        [{scale:.55, rotate:'-12deg'},{scale:1.18, rotate:'8deg'},{scale:1, rotate:'0deg'}],
+        {duration:420,easing:'cubic-bezier(.2,1.5,.4,1)'}
+      );
     });
     syncHud();
     await sleep(230);
@@ -565,7 +568,7 @@ function dropAndFill(){
       const o=makeTile(Math.floor(Math.random()*TYPES.length));
       place(o, r-R, c, true);
       grid[r][c]=o;
-      requestAnimationFrame(()=>place(o,r,c));
+      requestAnimationFrame(()=>requestAnimationFrame(()=>place(o,r,c)));
       landBounce(o, moved++*18);
     }
   }

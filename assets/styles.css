@@ -229,8 +229,11 @@ body{
 .tile.sel{z-index:8}
 .tile.sel .body{box-shadow:inset 0 -5px 8px rgba(0,0,0,.28), inset 0 4px 6px rgba(255,255,255,.55), 0 0 0 3px #fff, 0 0 16px 4px var(--gold)}
 .tile.dragging{z-index:9;transition:none}
-.tile.pop{animation:popout .26s forwards}
-@keyframes popout{0%{scale:1}45%{scale:1.32}100%{scale:0;opacity:0}}
+.tile.pop{pointer-events:none}
+.tile.pop .body,
+.tile.pop .gloss,
+.tile.pop em{animation:popout .26s forwards}
+@keyframes popout{0%{scale:1;opacity:1}45%{scale:1.32;opacity:1}100%{scale:0;opacity:0}}
 @keyframes pop{0%{transform:scale(.5)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
 
 .float{position:absolute;font-family:var(--display);font-weight:800;font-size:17px;color:var(--gold);text-shadow:0 2px 0 rgba(90,4,42,.7);pointer-events:none;animation:floatup .8s ease-out forwards;z-index:20}
@@ -349,7 +352,9 @@ body{
 @keyframes warnPulse{0%,100%{filter:none}50%{filter:brightness(1.18)}}
 .hud .pill.warn .k{color:var(--magenta)}
 .wave{position:absolute;border-radius:50%;border:4px solid rgba(255,255,255,.95);pointer-events:none;z-index:18;transform:translate(-50%,-50%)}
-.tile.land{animation:land .3s}
+.tile.land .body,
+.tile.land .gloss,
+.tile.land em{animation:land .3s}
 @keyframes land{0%{scale:1 1}30%{scale:1.18 .82}65%{scale:.92 1.08}100%{scale:1 1}}
 .tile.hint em{animation:hintPop .7s infinite}
 .tile.hint .body{box-shadow:inset 0 -5px 8px rgba(0,0,0,.28), inset 0 4px 6px rgba(255,255,255,.55), 0 0 0 3px rgba(255,201,60,.9), 0 0 16px 4px rgba(255,201,60,.55)}
