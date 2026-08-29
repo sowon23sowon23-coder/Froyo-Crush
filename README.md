@@ -1,6 +1,6 @@
 # Froyo Crush
 
-A static web app version of the Froyo Crush match-3 game.
+A static Yogurtland-style match-3 web app mockup.
 
 ## Run
 
@@ -15,15 +15,6 @@ python -m http.server 5173
 
 Then open `http://localhost:5173`.
 
-## Files
+## Notes
 
-```text
-Froyo-Crush/
-  index.html
-  assets/
-    styles.css
-    game.js
-  README.md
-```
-
-The app opens directly into the playable app interface. There is no prototype header, phone frame, screen picker, or footnote chrome.
+The page shows only the app mockup. Prototype controls, screen chips, and explanatory page text have been removed.

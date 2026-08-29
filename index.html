@@ -1,239 +1,252 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Froyo Crush</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Froyo Crush</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <main class="app" id="app">
-    <section class="view active" id="home">
-      <header class="appbar">
-        <div>
-          <p class="eyebrow">Yogurtland</p>
-          <h1>Froyo Crush</h1>
-        </div>
-        <button class="icon-button" type="button" data-view="rewards" aria-label="Rewards">
-          <span class="gift-icon"></span>
-        </button>
-      </header>
 
-      <section class="level-panel">
-        <div class="level-copy">
-          <span>Level 4</span>
-          <h2>Berry Blast</h2>
-          <p>Collect 15 strawberries before your moves run out.</p>
-        </div>
-        <div class="cup-art" aria-hidden="true">
-          <span class="soft-serve"></span>
-          <span class="cup"></span>
-        </div>
-      </section>
+<div class="phone" id="phone">
+  <div class="notch"></div>
 
-      <section class="progress-strip" aria-label="Reward progress">
-        <div>
-          <strong>2 levels</strong>
-          <span>to free topping</span>
-        </div>
-        <div class="meter"><span style="width:62%"></span></div>
-      </section>
+  <!-- 01 SPLASH -->
+  <section class="screen on" id="s-splash" data-name="01 Splash">
+    <div class="sprinkles" id="sprinkles"></div>
+    <div class="logo" style="font-size:26px;position:relative;z-index:2">Yogurtland<small>get real.</small></div>
+    <h2 class="splash-title" style="margin:16px 0 0"><span class="a">FROYO</span><span class="b">CRUSH</span></h2>
+    <div class="swirl">
+      <svg viewBox="0 0 120 120" width="150" height="150">
+        <ellipse cx="60" cy="104" rx="34" ry="9" fill="#C10F5E" opacity=".18"/>
+        <path d="M28 66h64l-7 34a8 8 0 0 1-8 7H43a8 8 0 0 1-8-7z" fill="#fff" stroke="#E9C9D8" stroke-width="2"/>
+        <path d="M60 12c-9 4-13 12-9 17-11 1-16 10-10 16-12 2-16 13-6 18 3 2 8 3 13 3h24c14 0 20-9 12-16 9-6 4-16-8-17 5-6 0-14-9-18-2-1-5-2-7-3z" fill="#FFFDFB" stroke="#EFD9E3" stroke-width="2"/>
+        <circle cx="44" cy="60" r="7" fill="#E02B45"/><circle cx="42" cy="57" r="2" fill="#fff" opacity=".6"/>
+        <circle cx="76" cy="58" r="6" fill="#4E3AA8"/><circle cx="74" cy="56" r="1.8" fill="#fff" opacity=".5"/>
+        <circle cx="60" cy="64" r="6.5" fill="#8CC63F"/>
+        <rect x="82" y="66" width="11" height="11" rx="3" fill="#FFC93C" transform="rotate(12 87 71)"/>
+        <circle cx="34" cy="70" r="5.5" fill="#7A4A2B"/>
+      </svg>
+    </div>
+    <div class="tapstart">TAP TO START</div>
+  </section>
 
-      <button class="primary-action" type="button" data-view="game">Play</button>
+  <!-- 02 LOGIN -->
+  <section class="screen" id="s-login" data-name="02 Code">
+    <div class="logo" style="font-size:22px">Yogurtland<small>get real.</small></div>
+    <h2 style="font-family:var(--display);font-size:24px;margin:18px 0 2px;color:var(--berry-700)">Welcome to <span style="color:var(--magenta)">FROYO CRUSH</span></h2>
+    <p style="font-size:12px;color:#8C5A72;margin:0;font-weight:500">Enter the 6-digit code on your receipt</p>
+    <div class="code" id="code">
+      <input maxlength="1" value="1"><input maxlength="1" value="2"><input maxlength="1" value="3">
+      <input maxlength="1" value="4"><input maxlength="1" value="5"><input maxlength="1" value="6">
+    </div>
+    <button class="btn" data-go="s-home">START PLAYING</button>
+    <div style="display:flex;gap:26px;margin-top:22px;font-size:11px;font-weight:700;color:var(--magenta)">
+      <span data-go="s-how" style="cursor:pointer">❓ How to play</span>
+      <span data-go="s-rewards" style="cursor:pointer">🎁 My rewards</span>
+    </div>
+  </section>
 
-      <div class="quick-grid">
-        <button type="button" data-view="map">
-          <span class="dot-icon map-dot"></span>
-          <strong>Map</strong>
-        </button>
-        <button type="button" data-view="rewards">
-          <span class="dot-icon reward-dot"></span>
-          <strong>Rewards</strong>
-        </button>
-        <button type="button" data-view="how">
-          <span class="dot-icon info-dot"></span>
-          <strong>How</strong>
-        </button>
+  <!-- 03 HOME -->
+  <section class="screen" id="s-home" data-name="03 Home">
+    <div style="display:flex;align-items:center;gap:10px;padding:46px 18px 14px">
+      <div style="width:40px;height:40px;border-radius:14px;background:linear-gradient(#FFD9E7,#FF9CC3);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 3px 0 rgba(59,6,32,.15)">🧑</div>
+      <div style="flex:1">
+        <div style="font-size:10px;font-weight:700;color:#B9829B;letter-spacing:1px">WELCOME BACK</div>
+        <div style="font-family:var(--display);font-size:18px;color:var(--berry-700);line-height:1">Yogurt Lover</div>
       </div>
-    </section>
-
-    <section class="view" id="map">
-      <header class="subbar">
-        <button class="back-button" type="button" data-view="home" aria-label="Back"></button>
-        <h2>Level Map</h2>
-      </header>
-      <div class="map-view">
-        <div class="trail">
-          <button class="node done" type="button">1</button>
-          <button class="node done" type="button">2</button>
-          <button class="node done" type="button">3</button>
-          <button class="node current" type="button" data-view="game">4</button>
-          <button class="node locked" type="button">5</button>
-          <button class="node locked" type="button">6</button>
-          <button class="node locked" type="button">7</button>
-        </div>
+      <div style="font-size:20px">🔔</div>
+    </div>
+    <div class="hero-card">
+      <div class="hero-row">
+        <div class="pill"><div class="k">Level</div><div class="v" id="homeLevel">04</div></div>
+        <div class="pill"><div class="k">Next reward</div><div class="v" style="font-size:15px;line-height:1.15">Free<br>topping 🍓</div></div>
       </div>
-      <div class="sticky-reward">
-        <div class="small-cup" aria-hidden="true"></div>
-        <div>
-          <span>Next reward</span>
-          <strong>Free topping</strong>
-        </div>
-        <button type="button" data-view="game">Play</button>
+      <div class="prog"><i id="homeProg"></i></div>
+      <div class="hero-note">Clear <b>2 more levels</b> to unlock it</div>
+    </div>
+    <div style="padding:18px 16px 0">
+      <button class="btn gold" data-go="s-game" style="font-size:24px">PLAY ▶</button>
+    </div>
+    <div class="tri">
+      <button class="tile-btn" data-go="s-map"><i>🗺️</i>LEVEL MAP</button>
+      <button class="tile-btn" data-go="s-rewards"><i>🎁</i>MY REWARDS</button>
+      <button class="tile-btn" data-go="s-how"><i>❓</i>HOW TO PLAY</button>
+    </div>
+    <nav class="tabbar"><button class="on"><i>🏠</i>HOME</button><button data-go="s-rewards"><i>🎁</i>REWARDS</button><button data-go="s-how"><i>❓</i>HOW TO PLAY</button></nav>
+  </section>
+
+  <!-- 04 MAP -->
+  <section class="screen" id="s-map" data-name="04 Level map">
+    <div class="topbar"><button class="back" data-go="s-home">‹</button><h2>LEVEL MAP</h2></div>
+    <div class="map-scroll" id="mapScroll">
+      <div class="cloud" style="width:90px;height:26px;top:24px;left:16px"></div>
+      <div class="cloud" style="width:64px;height:20px;top:86px;right:18px"></div>
+      <div id="swirlMap"></div>
+    </div>
+    <div class="map-foot">
+      <div style="font-size:30px">🍨</div>
+      <div style="flex:1">
+        <div style="font-size:9px;font-weight:800;letter-spacing:1.2px;color:#B9829B">NEXT REWARD</div>
+        <div style="font-family:var(--display);font-size:16px;color:var(--magenta);line-height:1.1">Free topping</div>
+        <div style="font-size:10px;color:#9E7387;font-weight:500">Clear 2 more levels</div>
       </div>
-    </section>
+      <button class="use" data-go="s-game">PLAY</button>
+    </div>
+  </section>
 
-    <section class="view game-view" id="game">
-      <header class="game-hud">
-        <button class="back-button light" type="button" data-view="home" aria-label="Quit"></button>
-        <div class="hud-stat">
-          <span>Goal</span>
-          <strong id="goalLeft">15</strong>
-        </div>
-        <div class="hud-stat">
-          <span>Moves</span>
-          <strong id="movesLeft">18</strong>
-        </div>
-        <div class="hud-stat">
-          <span>Score</span>
-          <strong id="scoreValue">0</strong>
-        </div>
-      </header>
+  <!-- 05 GAME -->
+  <section class="screen" id="s-game" data-name="05 Game (playable)">
+    <div class="hud">
+      <div class="pill"><div class="k">Level</div><div class="v">04</div></div>
+      <div class="pill"><div class="k">Goal</div><div class="v goal"><em>🍓</em><span id="goalLeft">15</span></div></div>
+      <div class="pill"><div class="k">Moves</div><div class="v" id="movesLeft">18</div></div>
+    </div>
+    <div class="scorebar">
+      <i id="scoreFill"></i>
+      <span class="st" id="st1" style="left:33%">⭐</span>
+      <span class="st" id="st2" style="left:66%">⭐</span>
+      <span class="st" id="st3" style="left:97%">⭐</span>
+    </div>
+    <div class="scoreval" id="scoreVal">0</div>
+    <div class="boardwrap">
+      <div class="board" id="board"></div>
+      <div class="combo" id="combo"></div>
+    </div>
+    <div class="banner" id="banner"></div>
+    <div class="flash" id="flash"></div>
+    <div class="boosters">
+      <button class="bo" data-go="s-home" title="Quit">⏸</button>
+      <button class="bo" id="boShuffle" title="Shuffle">🌀<b id="cShuffle">3</b></button>
+      <button class="bo" id="boBomb" title="Bomb — clears 3×3">💣<b id="cBomb">2</b></button>
+      <button class="bo" id="boHammer" title="Spoon — clears 1 topping">🥄<b id="cHammer">1</b></button>
+      <button class="bo" id="boReset" title="Restart">🔄</button>
+    </div>
 
-      <div class="score-meter" aria-hidden="true">
-        <span id="scoreFill"></span>
+    <!-- overlays -->
+    <div class="ov" id="ovClear">
+      <div class="card">
+        <div class="klabel">Level 04</div>
+        <h3>LEVEL COMPLETE!</h3>
+        <div class="starrow" id="clearStars"><span>⭐</span><span>⭐</span><span>⭐</span></div>
+        <div class="klabel">Score</div>
+        <div class="bigscore" id="clearScore">0</div>
+        <p id="clearMsg">Sweet run. Two levels to your free topping.</p>
+        <button class="btn lime" data-go="s-reward">NEXT ▶</button>
       </div>
-
-      <div class="board-shell">
-        <div class="board" id="board" aria-label="Froyo Crush game board"></div>
-        <div class="toast" id="toast"></div>
+    </div>
+    <div class="ov" id="ovFail">
+      <div class="card">
+        <h3 style="color:var(--berry-700)">OUT OF MOVES</h3>
+        <div style="font-size:56px;margin:6px 0">🍨</div>
+        <p>You needed <b id="failLeft">4</b> more strawberries. Try a different first match.</p>
+        <button class="btn" id="retry">TRY AGAIN</button>
+        <button class="btn ghost" data-go="s-home" style="margin-top:8px;color:var(--magenta);background:rgba(193,15,94,.1);box-shadow:0 3px 0 rgba(193,15,94,.2)">BACK TO HOME</button>
       </div>
+    </div>
+    <div class="confetti" id="confetti"></div>
+  </section>
 
-      <div class="boosters">
-        <button type="button" id="shuffleBtn">Shuffle <b id="shuffleCount">3</b></button>
-        <button type="button" id="bombBtn">Blast <b id="bombCount">2</b></button>
-        <button type="button" id="restartBtn">Restart</button>
+  <!-- 07 REWARD -->
+  <section class="screen" id="s-reward" data-name="07 Reward unlocked" style="background:linear-gradient(#FFF4EA,#FFD9E7);align-items:center;justify-content:center;padding:24px">
+    <div class="card" style="position:relative;overflow:visible">
+      <div class="rays"></div>
+      <div class="klabel">You unlocked</div>
+      <div class="giftbox">🎁</div>
+      <h3 style="margin-top:8px">FREE TOPPING</h3>
+      <p>On any regular cup. Valid until Sep 30, 2026 at any Yogurtland store.</p>
+      <button class="btn gold" data-go="s-rewards">CLAIM COUPON</button>
+    </div>
+  </section>
+
+  <!-- 08 REWARDS -->
+  <section class="screen" id="s-rewards" data-name="08 My rewards">
+    <div class="topbar"><button class="back" data-go="s-home">‹</button><h2>MY REWARDS</h2></div>
+    <div class="segs"><button class="on">AVAILABLE (2)</button><button>REDEEMED (1)</button></div>
+    <div class="rcard">
+      <div class="ic">🍓</div>
+      <div style="flex:1">
+        <h4>Free topping</h4>
+        <small>Valid until Sep 30, 2026</small>
+        <code>YL-A8F92K</code>
       </div>
-
-      <div class="modal" id="winModal" role="dialog" aria-modal="true" aria-labelledby="winTitle">
-        <div class="modal-card">
-          <span class="result-mark success"></span>
-          <h2 id="winTitle">Level Complete</h2>
-          <p id="winText">Sweet run. Your reward progress moved up.</p>
-          <button class="primary-action" type="button" data-view="rewards">Claim Reward</button>
-        </div>
+      <button class="use" data-go="s-coupon">USE</button>
+    </div>
+    <div class="rcard">
+      <div class="ic">🍨</div>
+      <div style="flex:1">
+        <h4>10% off any cup</h4>
+        <small>Valid until Oct 31, 2026</small>
+        <code>YL-C7D34M</code>
       </div>
+      <button class="use" data-go="s-coupon">USE</button>
+    </div>
+    <div style="margin:6px 18px 0;padding:12px 14px;border-radius:18px;background:rgba(193,15,94,.08);font-size:11px;color:#8C5A72;font-weight:500;line-height:1.5">
+      🏪 Show the coupon screen at the counter. Staff taps <b>Mark as redeemed</b> — one use per coupon.
+    </div>
+    <nav class="tabbar"><button data-go="s-home"><i>🏠</i>HOME</button><button class="on"><i>🎁</i>REWARDS</button><button data-go="s-how"><i>❓</i>HOW TO PLAY</button></nav>
+  </section>
 
-      <div class="modal" id="failModal" role="dialog" aria-modal="true" aria-labelledby="failTitle">
-        <div class="modal-card">
-          <span class="result-mark fail"></span>
-          <h2 id="failTitle">Out Of Moves</h2>
-          <p>Try one more run and look for the biggest berry matches first.</p>
-          <button class="primary-action" type="button" id="tryAgainBtn">Try Again</button>
-        </div>
-      </div>
-    </section>
+  <!-- 09 COUPON -->
+  <section class="screen" id="s-coupon" data-name="09 Coupon">
+    <div style="width:100%;padding:0 18px 6px"><button class="back" data-go="s-rewards">‹</button></div>
+    <div class="ticket">
+      <div class="logo" style="font-size:17px">Yogurtland<small>get real.</small></div>
+      <h3 style="font-family:var(--display);font-size:27px;color:var(--magenta);margin:10px 0 0">FREE TOPPING</h3>
+      <div class="qr"><i></i></div>
+      <div class="klabel">Coupon code</div>
+      <div class="ccode">YL-A8F92K</div>
+      <div style="font-size:11px;color:#9E7387;margin-top:8px;font-weight:500">Valid until Sep 30, 2026</div>
+    </div>
+    <p style="font-size:11.5px;color:#8C5A72;font-weight:600;margin:16px 0 10px">Hand your phone to the staff</p>
+    <div style="width:100%;padding:0 26px"><button class="btn" data-go="s-used">MARK AS REDEEMED</button></div>
+  </section>
 
-    <section class="view" id="rewards">
-      <header class="subbar">
-        <button class="back-button" type="button" data-view="home" aria-label="Back"></button>
-        <h2>Rewards</h2>
-      </header>
-      <div class="segmented">
-        <button class="active" type="button">Available</button>
-        <button type="button">Used</button>
-      </div>
-      <article class="reward-card">
-        <span class="reward-badge topping"></span>
-        <div>
-          <h3>Free topping</h3>
-          <p>Valid until Sep 30, 2026</p>
-          <code>YL-A8F92K</code>
-        </div>
-        <button type="button" data-view="coupon">Use</button>
-      </article>
-      <article class="reward-card">
-        <span class="reward-badge discount"></span>
-        <div>
-          <h3>10% off any cup</h3>
-          <p>Valid until Oct 31, 2026</p>
-          <code>YL-C7D34M</code>
-        </div>
-        <button type="button" data-view="coupon">Use</button>
-      </article>
-    </section>
+  <!-- 09-1 USED -->
+  <section class="screen" id="s-used" data-name="09-1 Redeemed">
+    <div style="width:100%;padding:0 18px 6px"><button class="back" style="background:rgba(255,255,255,.15);color:#fff" data-go="s-rewards">‹</button></div>
+    <div class="ticket">
+      <div class="logo" style="font-size:17px;color:#fff;opacity:.6">Yogurtland<small style="color:#fff">get real.</small></div>
+      <h3 style="font-family:var(--display);font-size:27px;color:#fff;opacity:.6;margin:10px 0 0">FREE TOPPING</h3>
+      <div class="qr" style="background:#5A4450;box-shadow:inset 0 0 0 3px rgba(255,255,255,.3);opacity:.35"><i></i></div>
+      <div class="ccode" style="color:#fff;opacity:.5">YL-A8F92K</div>
+      <div style="font-size:11px;opacity:.6;margin-top:8px">Redeemed Aug 29, 2026 · 6:24 PM</div>
+      <div class="stamp"><span>REDEEMED ✓</span></div>
+    </div>
+    <p style="font-size:12px;opacity:.75;margin-top:20px">This coupon has already been used.</p>
+    <div style="width:100%;padding:0 26px;margin-top:6px"><button class="btn ghost" data-go="s-home">BACK TO HOME</button></div>
+  </section>
 
-    <section class="view coupon-view" id="coupon">
-      <header class="subbar">
-        <button class="back-button" type="button" data-view="rewards" aria-label="Back"></button>
-        <h2>Coupon</h2>
-      </header>
-      <div class="ticket">
-        <p class="eyebrow">Yogurtland</p>
-        <h2>Free Topping</h2>
-        <div class="qr" aria-hidden="true"></div>
-        <span>Coupon code</span>
-        <strong>YL-A8F92K</strong>
-        <p>Valid until Sep 30, 2026</p>
-      </div>
-      <button class="primary-action" type="button" data-view="used">Mark As Redeemed</button>
-    </section>
+  <!-- 10 HOW -->
+  <section class="screen" id="s-how" data-name="10 How to play">
+    <div class="topbar"><button class="back" data-go="s-home">‹</button><h2>HOW TO PLAY</h2></div>
+    <div class="howrow">
+      <div class="demo"><span class="dot" style="background:radial-gradient(circle at 32% 28%,#FF8A9A,#E02B45)">🍓</span><span class="dot" style="background:radial-gradient(circle at 32% 28%,#FF8A9A,#E02B45)">🍓</span><span class="dot" style="background:radial-gradient(circle at 32% 28%,#FF8A9A,#E02B45)">🍓</span></div>
+      <div><h4>Match 3</h4><p>Swap two neighbours to line up three toppings.</p></div>
+    </div>
+    <div class="howrow">
+      <div class="demo"><span class="dot" style="background:radial-gradient(circle at 32% 28%,#B9E36B,#5C8C1E)">🥝</span><span class="dot" style="background:radial-gradient(circle at 32% 28%,#B9E36B,#5C8C1E)">🥝</span><span class="dot" style="background:radial-gradient(circle at 32% 28%,#B9E36B,#5C8C1E)">🥝</span><span class="dot" style="background:radial-gradient(circle at 32% 28%,#B9E36B,#5C8C1E)">🥝</span></div>
+      <div><h4>Match 4</h4><p>Four in a row drops a bigger score bonus.</p></div>
+    </div>
+    <div class="howrow">
+      <div class="demo"><span class="dot" style="background:radial-gradient(circle at 32% 28%,#FFE38A,#E09300)">💣</span></div>
+      <div><h4>Match 5</h4><p>Five in a row makes a Froyo Bomb.</p></div>
+    </div>
+    <div class="howrow">
+      <div class="demo"><span class="dot" style="background:radial-gradient(circle at 32% 28%,#FF9CC3,#C10F5E)">🎁</span></div>
+      <div><h4>Hit the goal</h4><p>Collect the goal topping before you run out of moves.</p></div>
+    </div>
+    <div class="howrow">
+      <div class="demo"><span class="dot" style="background:radial-gradient(circle at 32% 28%,#C8ED7E,#6FA31C)">🏪</span></div>
+      <div><h4>Redeem in store</h4><p>Every reward is a coupon you use at any Yogurtland.</p></div>
+    </div>
+    <nav class="tabbar"><button data-go="s-home"><i>🏠</i>HOME</button><button data-go="s-rewards"><i>🎁</i>REWARDS</button><button class="on"><i>❓</i>HOW TO PLAY</button></nav>
+  </section>
+</div>
 
-    <section class="view used-view" id="used">
-      <header class="subbar dark">
-        <button class="back-button light" type="button" data-view="rewards" aria-label="Back"></button>
-        <h2>Redeemed</h2>
-      </header>
-      <div class="used-ticket">
-        <h2>Free Topping</h2>
-        <strong>YL-A8F92K</strong>
-        <span>Redeemed</span>
-      </div>
-      <button class="primary-action muted" type="button" data-view="home">Back Home</button>
-    </section>
-
-    <section class="view" id="how">
-      <header class="subbar">
-        <button class="back-button" type="button" data-view="home" aria-label="Back"></button>
-        <h2>How To Play</h2>
-      </header>
-      <div class="how-list">
-        <article>
-          <div class="mini-match berry"></div>
-          <h3>Match 3</h3>
-          <p>Swap neighboring toppings to clear rows or columns.</p>
-        </article>
-        <article>
-          <div class="mini-match lime"></div>
-          <h3>Clear The Goal</h3>
-          <p>Collect the target topping before moves reach zero.</p>
-        </article>
-        <article>
-          <div class="mini-match gold"></div>
-          <h3>Use Boosters</h3>
-          <p>Shuffle the board or blast a cluster when you are stuck.</p>
-        </article>
-      </div>
-    </section>
-
-    <nav class="bottom-nav" aria-label="Main navigation">
-      <button class="active" type="button" data-view="home">
-        <span class="nav-home"></span>
-        Home
-      </button>
-      <button type="button" data-view="game">
-        <span class="nav-play"></span>
-        Play
-      </button>
-      <button type="button" data-view="rewards">
-        <span class="nav-gift"></span>
-        Rewards
-      </button>
-    </nav>
-  </main>
-  <script src="assets/game.js"></script>
+<script src="assets/game.js"></script>
 </body>
 </html>
