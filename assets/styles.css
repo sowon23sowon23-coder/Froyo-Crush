@@ -357,6 +357,44 @@ body{
 .howrow h4{font-family:var(--display);margin:0;font-size:14px;color:var(--magenta)}
 .howrow p{margin:1px 0 0;font-size:10.5px;color:#8C5A72;font-weight:500}
 
+/* ---------- 11 staff + 12 settings ---------- */
+#s-staff,#s-settings{background:linear-gradient(#FFF4EA,#FFE2EE)}
+.staff-card,.settings-list{
+  margin:8px 18px 0;background:#fff;border-radius:24px;padding:18px;
+  box-shadow:0 7px 0 rgba(59,6,32,.12), 0 18px 34px rgba(59,6,32,.12);
+}
+.staff-input{
+  width:100%;height:56px;margin:10px 0 12px;border-radius:16px;border:2px solid rgba(193,15,94,.18);
+  background:#FFF7FB;color:var(--berry-700);font-family:var(--display);font-size:24px;font-weight:800;
+  text-align:center;letter-spacing:1px;text-transform:uppercase;
+}
+.staff-input:focus{outline:none;border-color:var(--magenta);box-shadow:0 0 0 4px rgba(193,15,94,.13)}
+.staff-result{
+  display:flex;align-items:center;gap:12px;margin:14px 0;padding:13px;border-radius:18px;
+  background:rgba(193,15,94,.08);color:#8C5A72;
+}
+.staff-result h4{margin:0;font-family:var(--display);font-size:16px;color:var(--berry-700)}
+.staff-result p{margin:2px 0 0;font-size:11px;font-weight:600;line-height:1.4}
+.status-dot{width:34px;height:34px;border-radius:50%;background:#CDB4C2;box-shadow:inset 0 -4px 0 rgba(59,6,32,.18);flex:none}
+.staff-result.ok{background:rgba(168,216,75,.18)}
+.staff-result.ok .status-dot{background:linear-gradient(#C8ED7E,var(--lime))}
+.staff-result.bad{background:rgba(193,15,94,.13)}
+.staff-result.bad .status-dot{background:linear-gradient(#FF9CC3,var(--magenta))}
+.staff-card .btn:disabled{filter:grayscale(.7);opacity:.5;cursor:default;transform:none;box-shadow:0 4px 0 rgba(59,6,32,.15)}
+.setting-row{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 2px;
+  border-bottom:1px solid rgba(193,15,94,.1);color:var(--berry-700);
+}
+.setting-row span{display:flex;flex-direction:column;gap:2px}
+.setting-row b{font-family:var(--display);font-size:18px}
+.setting-row small{font-size:11px;color:#9E7387;font-weight:600}
+.setting-row input{width:48px;height:28px;accent-color:var(--magenta);flex:none}
+.settings-note{
+  margin:14px 0;padding:12px 14px;border-radius:16px;background:rgba(168,216,75,.17);
+  color:#5C7F15;font-size:11px;font-weight:700;text-align:center;
+}
+body.reduce-motion *{animation-duration:.001s!important;transition-duration:.05s!important}
+
 /* ---------- juice ---------- */
 .flyer{position:absolute;font-size:24px;z-index:70;pointer-events:none;filter:drop-shadow(0 3px 5px rgba(0,0,0,.45))}
 .hud .pill.bump{animation:bump .34s}

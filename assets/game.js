@@ -18,6 +18,7 @@ const SAVE_KEY='froyo-crush-progress-v1';
 let state=loadState();
 let activeRewardId=null;
 let justUnlockedReward=null;
+let staffRewardId=null;
 
 function go(id){
   screens.forEach(s=>s.classList.toggle('on', s.id===id));
@@ -27,6 +28,8 @@ function go(id){
   if(id==='s-coupon') renderCoupon(activeRewardId);
   if(id==='s-used') redeemActiveCoupon();
   if(id==='s-reward') renderUnlockedReward();
+  if(id==='s-staff') renderStaffReady();
+  if(id==='s-settings') renderSettings();
   if(id==='s-game') startLevel();
   if(id==='s-map') buildMap();
 }
@@ -35,6 +38,7 @@ document.addEventListener('click',e=>{
 });
 document.getElementById('s-splash').onclick=()=>go('s-login');
 go('s-splash');
+applySettings();
 
 function loadState(){
   try{
@@ -43,13 +47,15 @@ function loadState(){
       currentLevel:saved.currentLevel||4,
       unlockedLevel:Math.max(4,saved.unlockedLevel||4),
       stars:saved.stars||{},
-      rewards:saved.rewards||{}
+      rewards:saved.rewards||{},
+      settings:Object.assign({sound:true,vibration:true,reducedMotion:false}, saved.settings||{})
     };
   }catch(e){
-    return {currentLevel:4,unlockedLevel:4,stars:{},rewards:{}};
+    return {currentLevel:4,unlockedLevel:4,stars:{},rewards:{},settings:{sound:true,vibration:true,reducedMotion:false}};
   }
 }
 function saveState(){ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+function applySettings(){ document.body.classList.toggle('reduce-motion', !!state.settings.reducedMotion); }
 function levelFor(n){ return LEVELS.find(l=>l.n===n) || LEVELS[LEVELS.length-1]; }
 function currentLevel(){ return levelFor(Math.min(state.currentLevel, state.unlockedLevel)); }
 function nextReward(){
@@ -302,10 +308,81 @@ function renderUsedCoupon(id){
   document.getElementById('usedCode').textContent=reward.code;
   document.getElementById('usedDate').textContent='Redeemed '+usedAt.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})+' · '+usedAt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
 }
+function rewardIdByCode(code){
+  const clean=(code||'').trim().toUpperCase();
+  return Object.keys(REWARDS).find(id=>REWARDS[id].code===clean);
+}
+function setStaffResult(kind,title,message){
+  const box=document.getElementById('staffResult');
+  box.classList.toggle('ok', kind==='ok');
+  box.classList.toggle('bad', kind==='bad');
+  box.querySelector('h4').textContent=title;
+  box.querySelector('p').textContent=message;
+}
+function renderStaffReady(){
+  staffRewardId=null;
+  document.getElementById('staffRedeem').disabled=true;
+  setStaffResult('', 'Ready to verify', 'Enter a coupon code from the customer screen.');
+}
+function checkStaffCode(){
+  const code=document.getElementById('staffCode').value;
+  const id=rewardIdByCode(code);
+  staffRewardId=null;
+  document.getElementById('staffRedeem').disabled=true;
+  if(!id){
+    setStaffResult('bad','Code not found','This coupon code is not recognized.');
+    return;
+  }
+  if(!state.rewards[id]){
+    setStaffResult('bad','Not unlocked yet',REWARDS[id].title+' has not been earned on this device.');
+    return;
+  }
+  if(state.rewards[id].used){
+    setStaffResult('bad','Already redeemed',REWARDS[id].title+' was already marked as used.');
+    return;
+  }
+  staffRewardId=id;
+  document.getElementById('staffRedeem').disabled=false;
+  setStaffResult('ok','Valid coupon',REWARDS[id].title+' is available to redeem.');
+}
+function staffRedeemCoupon(){
+  if(!staffRewardId || !state.rewards[staffRewardId]) return;
+  state.rewards[staffRewardId].used=true;
+  state.rewards[staffRewardId].usedAt=new Date().toISOString();
+  saveState();
+  setStaffResult('ok','Redeemed',REWARDS[staffRewardId].title+' is now marked as used.');
+  document.getElementById('staffRedeem').disabled=true;
+  activeRewardId=staffRewardId;
+  renderRewards();
+}
+function renderSettings(){
+  document.getElementById('setSound').checked=!!state.settings.sound;
+  document.getElementById('setVibration').checked=!!state.settings.vibration;
+  document.getElementById('setMotion').checked=!!state.settings.reducedMotion;
+  applySettings();
+}
+function updateSetting(key,value){
+  state.settings[key]=value;
+  saveState();
+  applySettings();
+  document.getElementById('settingsNote').textContent='Settings saved on this device.';
+}
+function resetProgress(){
+  state={currentLevel:4,unlockedLevel:4,stars:{},rewards:{},settings:state.settings};
+  activeRewardId=null;
+  justUnlockedReward=null;
+  staffRewardId=null;
+  saveState();
+  renderProgress();
+  renderRewards();
+  renderSettings();
+  document.getElementById('settingsNote').textContent='Progress reset. Settings were kept.';
+}
 
 /* ---------------- sound (tiny) ---------------- */
 let actx=null;
 function blip(freq,dur=.08,type='sine',vol=.05){
+  if(!state.settings.sound) return;
   try{
     actx = actx || new (window.AudioContext||window.webkitAudioContext)();
     const o=actx.createOscillator(), g=actx.createGain();
@@ -317,7 +394,7 @@ function blip(freq,dur=.08,type='sine',vol=.05){
 }
 
 /* ---------------- feedback helpers ---------------- */
-function buzz(ms){ try{ navigator.vibrate && navigator.vibrate(ms) }catch(e){} }
+function buzz(ms){ if(!state.settings.vibration) return; try{ navigator.vibrate && navigator.vibrate(ms) }catch(e){} }
 function flashScreen(){
   const f=document.getElementById('flash');
   f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
@@ -843,6 +920,13 @@ function confettiBurst(){
 }
 document.getElementById('retry').onclick=startLevel;
 document.getElementById('boReset').onclick=startLevel;
+document.getElementById('staffCheck').onclick=checkStaffCode;
+document.getElementById('staffRedeem').onclick=staffRedeemCoupon;
+document.getElementById('staffCode').addEventListener('keydown',e=>{ if(e.key==='Enter') checkStaffCode(); });
+document.getElementById('setSound').onchange=e=>updateSetting('sound', e.target.checked);
+document.getElementById('setVibration').onchange=e=>updateSetting('vibration', e.target.checked);
+document.getElementById('setMotion').onchange=e=>updateSetting('reducedMotion', e.target.checked);
+document.getElementById('resetProgress').onclick=resetProgress;
 
 /* boosters */
 boShuffle.onclick=async()=>{

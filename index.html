@@ -75,6 +75,8 @@
       <button class="tile-btn" data-go="s-map"><i>🗺️</i>LEVEL MAP</button>
       <button class="tile-btn" data-go="s-rewards"><i>🎁</i>MY REWARDS</button>
       <button class="tile-btn" data-go="s-how"><i>❓</i>HOW TO PLAY</button>
+      <button class="tile-btn" data-go="s-staff"><i>✓</i>STAFF</button>
+      <button class="tile-btn" data-go="s-settings"><i>⚙</i>SETTINGS</button>
     </div>
     <nav class="tabbar"><button class="on"><i>🏠</i>HOME</button><button data-go="s-rewards"><i>🎁</i>REWARDS</button><button data-go="s-how"><i>❓</i>HOW TO PLAY</button></nav>
   </section>
@@ -227,6 +229,47 @@
       <div><h4>Redeem in store</h4><p>Every reward is a coupon you use at any Yogurtland.</p></div>
     </div>
     <nav class="tabbar"><button data-go="s-home"><i>🏠</i>HOME</button><button data-go="s-rewards"><i>🎁</i>REWARDS</button><button class="on"><i>❓</i>HOW TO PLAY</button></nav>
+  </section>
+
+  <!-- 11 STAFF -->
+  <section class="screen" id="s-staff" data-name="11 Staff">
+    <div class="topbar"><button class="back" data-go="s-home">‹</button><h2>STAFF REDEEM</h2></div>
+    <div class="staff-card">
+      <div class="klabel">Coupon check</div>
+      <input id="staffCode" class="staff-input" value="YL-A8F92K" autocomplete="off" spellcheck="false">
+      <button class="btn lime" id="staffCheck">CHECK CODE</button>
+      <div class="staff-result" id="staffResult">
+        <div class="status-dot"></div>
+        <div>
+          <h4>Ready to verify</h4>
+          <p>Enter a coupon code from the customer screen.</p>
+        </div>
+      </div>
+      <button class="btn" id="staffRedeem" disabled>REDEEM COUPON</button>
+    </div>
+    <nav class="tabbar"><button data-go="s-home"><i>🏠</i>HOME</button><button data-go="s-rewards"><i>🎁</i>REWARDS</button><button data-go="s-settings"><i>⚙</i>SETTINGS</button></nav>
+  </section>
+
+  <!-- 12 SETTINGS -->
+  <section class="screen" id="s-settings" data-name="12 Settings">
+    <div class="topbar"><button class="back" data-go="s-home">‹</button><h2>SETTINGS</h2></div>
+    <div class="settings-list">
+      <label class="setting-row">
+        <span><b>Sound</b><small>Game taps and reward chimes</small></span>
+        <input type="checkbox" id="setSound" checked>
+      </label>
+      <label class="setting-row">
+        <span><b>Vibration</b><small>Mobile haptic feedback</small></span>
+        <input type="checkbox" id="setVibration" checked>
+      </label>
+      <label class="setting-row">
+        <span><b>Reduced motion</b><small>Lower flashes, bounce, and shake</small></span>
+        <input type="checkbox" id="setMotion">
+      </label>
+      <div class="settings-note" id="settingsNote">Progress is saved on this device.</div>
+      <button class="btn ghost" id="resetProgress">RESET PROGRESS</button>
+    </div>
+    <nav class="tabbar"><button data-go="s-home"><i>🏠</i>HOME</button><button data-go="s-rewards"><i>🎁</i>REWARDS</button><button class="on"><i>⚙</i>SETTINGS</button></nav>
   </section>
 </div>
 
