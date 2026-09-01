@@ -1,20 +1,20 @@
 /* ---------------- screen router ---------------- */
 const screens=[...document.querySelectorAll('.screen')];
 const LEVELS=[
-  {n:4,name:'Berry Blast',mode:'collect',targetType:0,goal:15,moves:18,target:6000,types:6},
-  {n:5,name:'Kiwi Rush',mode:'collect',targetType:2,goal:18,moves:20,target:7600,types:6},
-  {n:6,name:'Chocolate Drop',mode:'collect',targetType:4,goal:20,moves:19,target:9000,types:6,reward:'free-topping'},
-  {n:7,name:'Mango Pop',mode:'collect',targetType:3,goal:22,moves:18,target:10600,types:6},
-  {n:8,name:'Mochi Mix',mode:'collect',targetType:5,goal:24,moves:17,target:12400,types:6,reward:'discount'},
-  {n:9,name:'Score Sprint',mode:'score',goal:14000,moves:17,target:14000,types:6},
-  {n:10,name:'Cup Finale',mode:'collect',targetType:0,goal:30,moves:16,target:16800,types:6,reward:'free-cup'}
+  {n:1,name:'Berry Blast',mode:'collect',targetType:0,goal:15,moves:18,target:6000,types:6},
+  {n:2,name:'Kiwi Rush',mode:'collect',targetType:2,goal:18,moves:20,target:7600,types:6},
+  {n:3,name:'Chocolate Drop',mode:'collect',targetType:4,goal:20,moves:19,target:9000,types:6,reward:'free-topping'},
+  {n:4,name:'Mango Pop',mode:'collect',targetType:3,goal:22,moves:18,target:10600,types:6},
+  {n:5,name:'Mochi Mix',mode:'collect',targetType:5,goal:24,moves:17,target:12400,types:6,reward:'discount'},
+  {n:6,name:'Score Sprint',mode:'score',goal:14000,moves:17,target:14000,types:6},
+  {n:7,name:'Cup Finale',mode:'collect',targetType:0,goal:30,moves:16,target:16800,types:6,reward:'free-cup'}
 ];
 const REWARDS={
   'free-topping':{title:'Free topping',short:'Free topping',desc:'On any regular cup. Valid until Sep 30, 2026 at any Yogurtland store.',code:'YL-A8F92K',valid:'Valid until Sep 30, 2026',icon:'🍓'},
   discount:{title:'10% off any cup',short:'10% off',desc:'A little extra sweetness for your next visit. Valid until Oct 31, 2026.',code:'YL-C7D34M',valid:'Valid until Oct 31, 2026',icon:'🍨'},
   'free-cup':{title:'Free cup',short:'Free cup',desc:'You crushed the finale. Valid until Nov 30, 2026 at any Yogurtland store.',code:'YL-F9P21Q',valid:'Valid until Nov 30, 2026',icon:'🏆'}
 };
-const SAVE_KEY='froyo-crush-progress-v1';
+const SAVE_KEY='froyo-crush-progress-v2';
 let state=loadState();
 let activeRewardId=null;
 let justUnlockedReward=null;
@@ -45,8 +45,8 @@ function loadState(){
   try{
     const saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'{}');
     return {
-      currentLevel:saved.currentLevel||4,
-      unlockedLevel:Math.max(4,saved.unlockedLevel||4),
+      currentLevel:saved.currentLevel||1,
+      unlockedLevel:Math.max(1,saved.unlockedLevel||1),
       stars:saved.stars||{},
       rewards:saved.rewards||{},
       history:saved.history||[],
@@ -54,7 +54,7 @@ function loadState(){
       settings:Object.assign({sound:true,vibration:true,reducedMotion:false}, saved.settings||{})
     };
   }catch(e){
-    return {currentLevel:4,unlockedLevel:4,stars:{},rewards:{},history:[],seenTutorial:false,settings:{sound:true,vibration:true,reducedMotion:false}};
+    return {currentLevel:1,unlockedLevel:1,stars:{},rewards:{},history:[],seenTutorial:false,settings:{sound:true,vibration:true,reducedMotion:false}};
   }
 }
 function saveState(){ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
@@ -106,78 +106,6 @@ function swirlPoint(t){
     front: Math.sin(a)
   };
 }
-function buildMap(){
-  const host=document.getElementById('swirlMap'); if(host.dataset.built) return; host.dataset.built=1;
-
-  let blobs='';
-  for(let i=0;i<=190;i++){
-    const p=swirlPoint(i/190);
-    blobs+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.r.toFixed(1)}" fill="url(#swg)" stroke="#EFD9E3" stroke-width="1" stroke-opacity=".5"/>`;
-  }
-  host.innerHTML=`
-  <svg viewBox="0 0 360 640" width="360" height="640">
-    <defs>
-      <radialGradient id="swg" cx="34%" cy="28%" r="78%">
-        <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#F0D8E4"/>
-      </radialGradient>
-      <linearGradient id="cup" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stop-color="#F6E5EC"/><stop offset=".45" stop-color="#FFFFFF"/><stop offset="1" stop-color="#EBD3DE"/>
-      </linearGradient>
-    </defs>
-    <ellipse cx="180" cy="612" rx="108" ry="16" fill="#8A0B44" opacity=".14"/>
-    ${blobs}
-    <path d="M74 500h212l-20 96a16 16 0 0 1-16 13H110a16 16 0 0 1-16-13z" fill="url(#cup)" stroke="#E4C7D5" stroke-width="2"/>
-    <ellipse cx="180" cy="500" rx="106" ry="15" fill="#FFFFFF" stroke="#E4C7D5" stroke-width="2"/>
-    <text x="180" y="558" text-anchor="middle" font-family="Baloo 2, sans-serif" font-size="19" font-weight="800" fill="#C10F5E">Yogurtland</text>
-    <text x="180" y="574" text-anchor="middle" font-family="Poppins, sans-serif" font-size="9" font-weight="700" fill="#8CC63F">get real.</text>
-  </svg>`;
-
-  const toppings=[[0.10,'🍓',22],[0.24,'🫐',18],[0.38,'🥝',20],[0.52,'🍫',17],[0.66,'🥭',16],[0.80,'🍥',14]];
-  toppings.forEach(([t,e,s])=>{
-    const p=swirlPoint(t+0.055);
-    const d=document.createElement('div'); d.className='topping';
-    d.style.cssText=`left:${p.x-46*(1-t*.7)}px;top:${p.y+4}px;font-size:${s}px`;
-    d.textContent=e; host.appendChild(d);
-  });
-
-  for(let i=0;i<7;i++){
-    const lvl=i+1, t=0.055+i*0.142, p=swirlPoint(t);
-    const state = lvl<4?'done' : lvl===4?'now':'lock';
-    const n=document.createElement('div');
-    n.className='node '+state;
-    n.style.left=p.x+'px'; n.style.top=p.y+'px';
-    const sc=1-t*0.22; n.style.scale=sc;
-    n.textContent = state==='lock' ? '🔒' : lvl;
-    if(state!=='lock') n.onclick=()=>go('s-game');
-    host.appendChild(n);
-
-    const st=document.createElement('div'); st.className='stars';
-    st.style.left=p.x+'px'; st.style.top=(p.y+30*sc)+'px';
-    st.style.fontSize=(12*sc)+'px';
-    st.textContent = state==='done' ? '⭐⭐⭐' : state==='now' ? '' : '☆☆☆';
-    st.style.opacity = state==='lock' ? .35 : 1;
-    host.appendChild(st);
-
-    if(lvl===5||lvl===7){
-      const g=document.createElement('div'); g.className='gift';
-      g.style.left=(p.x + (p.x<180?-44:44))+'px'; g.style.top=p.y+'px'; g.textContent='🎁';
-      host.appendChild(g);
-    }
-    if(state==='now'){
-      const y=document.createElement('div'); y.className='youhere';
-      y.style.left=(p.x + (p.x<180?66:-66))+'px'; y.style.top=(p.y-2)+'px';
-      y.textContent='YOU ARE HERE';
-      host.appendChild(y);
-    }
-  }
-  const tip=swirlPoint(1);
-  const cherry=document.createElement('div'); cherry.className='gift';
-  cherry.style.cssText=`left:${tip.x}px;top:${tip.y-16}px;font-size:26px`;
-  cherry.textContent='🍒'; host.appendChild(cherry);
-  const flag=document.createElement('div'); flag.className='tipflag';
-  flag.style.cssText=`left:${tip.x}px;top:${tip.y-48}px`;
-  flag.textContent='FREE CUP · LEVEL 12'; host.appendChild(flag);
-}
 function renderProgress(){
   const level=currentLevel();
   const reward=nextReward();
@@ -187,7 +115,7 @@ function renderProgress(){
   if(reward){
     const remaining=Math.max(0,reward.n-state.unlockedLevel+1);
     const r=REWARDS[reward.reward];
-    const segStart=LEVELS.reduce((m,l)=>(l.reward&&l.n<reward.n)?Math.max(m,l.n):m,3);
+    const segStart=LEVELS.reduce((m,l)=>(l.reward&&l.n<reward.n)?Math.max(m,l.n):m,0);
     const segTotal=Math.max(1,reward.n-segStart);
     const pct=Math.max(0,Math.min(100,(segTotal-remaining)/segTotal*100));
     document.getElementById('homeReward').innerHTML=(r.short||r.title).replace(' ','<br>')+' '+r.icon;
@@ -204,7 +132,7 @@ function renderProgress(){
   }
 }
 
-buildMap=function(){
+function buildMap(){
   const host=document.getElementById('swirlMap');
   let blobs='';
   for(let i=0;i<=190;i++){
@@ -268,7 +196,7 @@ buildMap=function(){
       host.appendChild(y);
     }
   });
-};
+}
 
 function renderRewards(){
   const list=document.getElementById('rewardList');
@@ -397,7 +325,7 @@ function updateSetting(key,value){
   document.getElementById('settingsNote').textContent='Settings saved on this device.';
 }
 function resetProgress(){
-  state={currentLevel:4,unlockedLevel:4,stars:{},rewards:{},history:[],seenTutorial:false,settings:state.settings};
+  state={currentLevel:1,unlockedLevel:1,stars:{},rewards:{},history:[],seenTutorial:false,settings:state.settings};
   activeRewardId=null;
   justUnlockedReward=null;
   staffRewardId=null;
