@@ -10,9 +10,9 @@ const LEVELS=[
   {n:10,name:'Cup Finale',mode:'collect',targetType:0,goal:30,moves:16,target:16800,types:6,reward:'free-cup'}
 ];
 const REWARDS={
-  'free-topping':{title:'Free topping',desc:'On any regular cup. Valid until Sep 30, 2026 at any Yogurtland store.',code:'YL-A8F92K',valid:'Valid until Sep 30, 2026',icon:'🍓'},
-  discount:{title:'10% off any cup',desc:'A little extra sweetness for your next visit. Valid until Oct 31, 2026.',code:'YL-C7D34M',valid:'Valid until Oct 31, 2026',icon:'🍨'},
-  'free-cup':{title:'Free cup',desc:'You crushed the finale. Valid until Nov 30, 2026 at any Yogurtland store.',code:'YL-F9P21Q',valid:'Valid until Nov 30, 2026',icon:'🏆'}
+  'free-topping':{title:'Free topping',short:'Free topping',desc:'On any regular cup. Valid until Sep 30, 2026 at any Yogurtland store.',code:'YL-A8F92K',valid:'Valid until Sep 30, 2026',icon:'🍓'},
+  discount:{title:'10% off any cup',short:'10% off',desc:'A little extra sweetness for your next visit. Valid until Oct 31, 2026.',code:'YL-C7D34M',valid:'Valid until Oct 31, 2026',icon:'🍨'},
+  'free-cup':{title:'Free cup',short:'Free cup',desc:'You crushed the finale. Valid until Nov 30, 2026 at any Yogurtland store.',code:'YL-F9P21Q',valid:'Valid until Nov 30, 2026',icon:'🏆'}
 };
 const SAVE_KEY='froyo-crush-progress-v1';
 let state=loadState();
@@ -187,11 +187,14 @@ function renderProgress(){
   if(reward){
     const remaining=Math.max(0,reward.n-state.unlockedLevel+1);
     const r=REWARDS[reward.reward];
-    document.getElementById('homeReward').innerHTML=r.title.replace(' ','<br>')+' '+r.icon;
+    const segStart=LEVELS.reduce((m,l)=>(l.reward&&l.n<reward.n)?Math.max(m,l.n):m,3);
+    const segTotal=Math.max(1,reward.n-segStart);
+    const pct=Math.max(0,Math.min(100,(segTotal-remaining)/segTotal*100));
+    document.getElementById('homeReward').innerHTML=(r.short||r.title).replace(' ','<br>')+' '+r.icon;
     document.getElementById('homeNote').innerHTML='Clear <b>'+remaining+' more level'+(remaining===1?'':'s')+'</b> to unlock it';
     document.getElementById('mapRewardTitle').textContent=r.title;
     document.getElementById('mapRewardNote').textContent='Clear '+remaining+' more level'+(remaining===1?'':'s');
-    document.getElementById('homeProg').style.width=Math.min(100,(state.unlockedLevel-4)/(reward.n-4)*100)+'%';
+    document.getElementById('homeProg').style.width=pct+'%';
   }else{
     document.getElementById('homeReward').innerHTML='All<br>claimed 🏆';
     document.getElementById('homeNote').innerHTML='All rewards unlocked';

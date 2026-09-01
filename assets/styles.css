@@ -182,7 +182,6 @@ body{
 }
 .tile-btn:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(59,6,32,.16)}
 .tile-btn i{font-style:normal;font-size:22px}
-.tri .tile-btn:last-child{grid-column:1 / -1;min-height:64px}
 
 /* ---------- 04 map ---------- */
 #s-map{background:linear-gradient(#CFEBFF 0%, #E9F7D9 55%, #FFF1DC 100%);overflow:hidden}
