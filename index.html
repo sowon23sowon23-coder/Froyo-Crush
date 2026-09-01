@@ -56,7 +56,8 @@
 
   <!-- 03 HOME -->
   <section class="screen" id="s-home" data-name="03 Home">
-    <div style="display:flex;align-items:center;gap:10px;padding:46px 18px 14px">
+   <div class="scroll-body">
+    <div class="home-head">
       <div data-go="s-settings" style="width:40px;height:40px;border-radius:14px;background:linear-gradient(#FFD9E7,#FF9CC3);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 3px 0 rgba(59,6,32,.15);cursor:pointer">🧑</div>
       <div style="flex:1">
         <div style="font-size:10px;font-weight:700;color:#B9829B;letter-spacing:1px">WELCOME BACK</div>
@@ -94,6 +95,7 @@
       <b>Advertisement</b>
       <small>Banner ad space · 320 × 50</small>
     </div>
+   </div>
     <nav class="tabbar"><button class="on"><i>🏠</i>HOME</button><button data-go="s-rewards"><i>🎁</i>REWARDS</button><button data-go="s-how"><i>❓</i>HOW TO PLAY</button></nav>
   </section>
 
@@ -194,6 +196,7 @@
 
   <!-- 08 REWARDS -->
   <section class="screen" id="s-rewards" data-name="08 My rewards">
+   <div class="scroll-body">
     <div class="topbar"><button class="back" data-go="s-home">‹</button><h2>MY REWARDS</h2></div>
     <div class="segs"><button class="on" id="availableCount">AVAILABLE (0)</button><button id="redeemedCount">REDEEMED (0)</button></div>
     <div id="rewardList"></div>
@@ -204,6 +207,7 @@
       <b>Advertisement</b>
       <small>Banner ad space · 320 × 50</small>
     </div>
+   </div>
     <nav class="tabbar"><button data-go="s-home"><i>🏠</i>HOME</button><button class="on"><i>🎁</i>REWARDS</button><button data-go="s-how"><i>❓</i>HOW TO PLAY</button></nav>
   </section>
 
@@ -241,6 +245,7 @@
 
   <!-- 10 HOW -->
   <section class="screen" id="s-how" data-name="10 How to play">
+   <div class="scroll-body">
     <div class="topbar"><button class="back" data-go="s-home">‹</button><h2>HOW TO PLAY</h2></div>
     <div class="howrow">
       <div class="demo"><span class="dot" style="background:radial-gradient(circle at 32% 28%,#FF8A9A,#E02B45)">🍓</span><span class="dot" style="background:radial-gradient(circle at 32% 28%,#FF8A9A,#E02B45)">🍓</span><span class="dot" style="background:radial-gradient(circle at 32% 28%,#FF8A9A,#E02B45)">🍓</span></div>
@@ -266,11 +271,13 @@
       <b>Advertisement</b>
       <small>Banner ad space · 320 × 50</small>
     </div>
+   </div>
     <nav class="tabbar"><button data-go="s-home"><i>🏠</i>HOME</button><button data-go="s-rewards"><i>🎁</i>REWARDS</button><button class="on"><i>❓</i>HOW TO PLAY</button></nav>
   </section>
 
   <!-- 11 STAFF -->
   <section class="screen" id="s-staff" data-name="11 Staff">
+   <div class="scroll-body">
     <div class="topbar"><button class="back" data-go="s-home">‹</button><h2>STAFF REDEEM</h2></div>
     <div class="staff-card">
       <div class="klabel">Coupon check</div>
@@ -285,11 +292,13 @@
       </div>
       <button class="btn" id="staffRedeem" disabled>REDEEM COUPON</button>
     </div>
+   </div>
     <nav class="tabbar"><button data-go="s-home"><i>🏠</i>HOME</button><button data-go="s-rewards"><i>🎁</i>REWARDS</button><button data-go="s-settings"><i>⚙</i>SETTINGS</button></nav>
   </section>
 
   <!-- 12 SETTINGS -->
   <section class="screen" id="s-settings" data-name="12 Settings">
+   <div class="scroll-body">
     <div class="topbar"><button class="back" data-go="s-home">‹</button><h2>SETTINGS</h2></div>
     <div class="settings-list">
       <label class="setting-row">
@@ -311,13 +320,16 @@
       <div class="settings-note" id="settingsNote">Progress is saved on this device.</div>
       <button class="btn ghost" id="resetProgress">RESET PROGRESS</button>
     </div>
+   </div>
     <nav class="tabbar"><button data-go="s-home"><i>🏠</i>HOME</button><button data-go="s-rewards"><i>🎁</i>REWARDS</button><button class="on"><i>⚙</i>SETTINGS</button></nav>
   </section>
 
   <!-- 13 HISTORY -->
   <section class="screen" id="s-history" data-name="13 History">
+   <div class="scroll-body">
     <div class="topbar"><button class="back" data-go="s-home">‹</button><h2>HISTORY</h2></div>
     <div class="history-list" id="historyList"></div>
+   </div>
     <nav class="tabbar"><button data-go="s-home"><i>🏠</i>HOME</button><button data-go="s-rewards"><i>🎁</i>REWARDS</button><button data-go="s-settings"><i>⚙</i>SETTINGS</button></nav>
   </section>
 </div>
