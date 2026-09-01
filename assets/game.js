@@ -337,7 +337,7 @@ function renderAuthTab(){
   document.getElementById('tabSignin').classList.toggle('on',signup);
   document.getElementById('tabLogin').classList.toggle('on',!signup);
   document.getElementById('authHint').textContent=signup
-    ? 'Enter the 6-digit code from your receipt'
+    ? "Create a 6-digit code you'll remember"
     : 'Enter your 6-digit player code';
   document.getElementById('authSubmit').textContent=signup?'CREATE PLAYER':'LOG IN';
   document.getElementById('authError').textContent='';
