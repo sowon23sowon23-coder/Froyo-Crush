@@ -3,16 +3,16 @@ const screens=[...document.querySelectorAll('.screen')];
 const LEVELS=[
   {n:1,name:'Berry Blast',mode:'collect',targetType:0,goal:15,moves:18,target:6000,types:6},
   {n:2,name:'Kiwi Rush',mode:'collect',targetType:2,goal:18,moves:20,target:7600,types:6},
-  {n:3,name:'Chocolate Drop',mode:'collect',targetType:4,goal:20,moves:19,target:9000,types:6,reward:'free-topping'},
+  {n:3,name:'Chocolate Drop',mode:'collect',targetType:4,goal:20,moves:19,target:9000,types:6,reward:'off-3'},
   {n:4,name:'Mango Pop',mode:'collect',targetType:3,goal:22,moves:18,target:10600,types:6},
-  {n:5,name:'Mochi Mix',mode:'collect',targetType:5,goal:24,moves:17,target:12400,types:6,reward:'discount'},
+  {n:5,name:'Mochi Mix',mode:'collect',targetType:5,goal:24,moves:17,target:12400,types:6,reward:'off-5'},
   {n:6,name:'Score Sprint',mode:'score',goal:14000,moves:17,target:14000,types:6},
-  {n:7,name:'Cup Finale',mode:'collect',targetType:0,goal:30,moves:16,target:16800,types:6,reward:'free-cup'}
+  {n:7,name:'Cup Finale',mode:'collect',targetType:0,goal:30,moves:16,target:16800,types:6,reward:'off-10'}
 ];
 const REWARDS={
-  'free-topping':{title:'Free topping',short:'Free topping',desc:'On any regular cup. Valid until Sep 30, 2026 at any Yogurtland store.',code:'YL-A8F92K',valid:'Valid until Sep 30, 2026',icon:'🍓'},
-  discount:{title:'10% off any cup',short:'10% off',desc:'A little extra sweetness for your next visit. Valid until Oct 31, 2026.',code:'YL-C7D34M',valid:'Valid until Oct 31, 2026',icon:'🍨'},
-  'free-cup':{title:'Free cup',short:'Free cup',desc:'You crushed the finale. Valid until Nov 30, 2026 at any Yogurtland store.',code:'YL-F9P21Q',valid:'Valid until Nov 30, 2026',icon:'🏆'}
+  'off-3':{title:'3% off your cup',short:'3% off',desc:'3% off any regular cup. Valid until Sep 30, 2026 at any Yogurtland store.',code:'YL-A8F92K',valid:'Valid until Sep 30, 2026',icon:'🥉'},
+  'off-5':{title:'5% off your cup',short:'5% off',desc:'5% off any regular cup. Valid until Oct 31, 2026 at any Yogurtland store.',code:'YL-C7D34M',valid:'Valid until Oct 31, 2026',icon:'🥈'},
+  'off-10':{title:'10% off your cup',short:'10% off',desc:'10% off any regular cup — you crushed the finale. Valid until Nov 30, 2026 at any Yogurtland store.',code:'YL-F9P21Q',valid:'Valid until Nov 30, 2026',icon:'🥇'}
 };
 const SAVE_KEY='froyo-crush-progress-v2';
 let state=loadState();
