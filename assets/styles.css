@@ -112,6 +112,17 @@ body{
 .tabbar button.on{color:var(--magenta);background:rgba(193,15,94,.09)}
 .tabbar button.on i{filter:none}
 
+/* ---------- ad placeholder ---------- */
+.ad-slot{
+  flex:none;margin:auto 16px 8px;height:54px;border-radius:14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  background:#D8D3D6;border:1.5px dashed #A69EA3;color:#6E656B;
+}
+.ad-slot b{font-family:var(--ui);font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase}
+.ad-slot small{font-size:8.5px;font-weight:700;letter-spacing:1px;opacity:.75;margin-top:2px}
+.ad-slot + .tabbar{margin-top:0}
+.ad-slot.map-ad{position:absolute;left:14px;right:14px;bottom:16px;margin:0;z-index:5}
+
 /* ---------- 01 splash ---------- */
 #s-splash{
   background:radial-gradient(120% 80% at 50% 15%, #FFFFFF 0%, #FFE9F1 45%, #FFC9DE 100%);
@@ -185,7 +196,7 @@ body{
 
 /* ---------- 04 map ---------- */
 #s-map{background:linear-gradient(#CFEBFF 0%, #E9F7D9 55%, #FFF1DC 100%);overflow:hidden}
-.map-scroll{flex:1;position:relative;overflow-y:auto;padding:6px 0 150px;min-height:0}
+.map-scroll{flex:1;position:relative;overflow-y:auto;padding:6px 0 214px;min-height:0}
 .cloud{position:absolute;background:rgba(255,255,255,.75);border-radius:99px;filter:blur(.4px)}
 .path{position:absolute;inset:0;width:100%;height:100%}
 .node{
@@ -200,7 +211,7 @@ body{
 .stars{position:absolute;transform:translate(-50%,-50%);font-size:12px;letter-spacing:-1px;white-space:nowrap}
 .gift{position:absolute;transform:translate(-50%,-50%);font-size:22px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.25));animation:bob 2.2s ease-in-out infinite}
 .youhere{position:absolute;transform:translate(-50%,-50%);background:#fff;color:var(--magenta);font-size:9px;font-weight:800;padding:5px 9px;border-radius:99px;box-shadow:0 3px 0 rgba(59,6,32,.16);letter-spacing:.6px;white-space:nowrap}
-.map-foot{position:absolute;left:14px;right:14px;bottom:18px;background:#fff;border-radius:22px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 7px 0 rgba(59,6,32,.14);z-index:5}
+.map-foot{position:absolute;left:14px;right:14px;bottom:82px;background:#fff;border-radius:22px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 7px 0 rgba(59,6,32,.14);z-index:5}
 
 /* ---------- 05 game ---------- */
 #s-game{
