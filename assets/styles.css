@@ -143,8 +143,11 @@ body{
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
 
 /* ---------- 02 login ---------- */
-#s-login{background:linear-gradient(#FFFFFF 55%, #FFD9E7);padding:70px 26px 0;align-items:center;text-align:center}
-.code{display:flex;gap:8px;justify-content:center;margin:20px 0 26px}
+#s-login{background:linear-gradient(#FFFFFF 55%, #FFD9E7);padding:64px 26px 0;align-items:center;text-align:center}
+#s-login .segs{width:100%;max-width:300px;margin:16px 0 12px}
+.auth-error{min-height:15px;margin:10px 0 0;font-size:11px;font-weight:700;color:var(--magenta)}
+.link-btn{border:none;background:none;color:var(--magenta);font-family:var(--ui);font-size:12px;font-weight:800;letter-spacing:.3px;cursor:pointer;padding:6px 2px;flex:none}
+.code{display:flex;gap:8px;justify-content:center;margin:18px 0 4px}
 .code input{
   width:44px;height:56px;border-radius:14px;border:2px solid rgba(193,15,94,.2);background:#fff;
   font-family:var(--display);font-size:26px;font-weight:800;color:var(--magenta);text-align:center;

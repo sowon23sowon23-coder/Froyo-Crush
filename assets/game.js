@@ -20,7 +20,9 @@ let activeRewardId=null;
 let justUnlockedReward=null;
 let staffRewardId=null;
 
+const GATED=new Set(['s-home','s-map','s-game','s-rewards','s-coupon','s-used','s-reward','s-staff','s-settings','s-history']);
 function go(id){
+  if(GATED.has(id) && !(state.auth&&state.auth.loggedIn)) id='s-login';
   screens.forEach(s=>s.classList.toggle('on', s.id===id));
   document.querySelectorAll('.ov').forEach(o=>o.classList.remove('on'));
   renderProgress();
@@ -28,6 +30,7 @@ function go(id){
   if(id==='s-coupon') renderCoupon(activeRewardId);
   if(id==='s-used') redeemActiveCoupon();
   if(id==='s-reward') renderUnlockedReward();
+  if(id==='s-login') syncAuthScreen();
   if(id==='s-staff') renderStaffReady();
   if(id==='s-settings') renderSettings();
   if(id==='s-history') renderHistory();
@@ -37,7 +40,7 @@ function go(id){
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-go]'); if(t){ blip(660,.05); go(t.dataset.go); }
 });
-document.getElementById('s-splash').onclick=()=>go('s-login');
+document.getElementById('s-splash').onclick=()=>go((state.auth&&state.auth.loggedIn)?'s-home':'s-login');
 go('s-splash');
 applySettings();
 
@@ -51,10 +54,11 @@ function loadState(){
       rewards:saved.rewards||{},
       history:saved.history||[],
       seenTutorial:!!saved.seenTutorial,
+      auth:(saved.auth&&saved.auth.code)?{code:String(saved.auth.code),loggedIn:!!saved.auth.loggedIn}:null,
       settings:Object.assign({sound:true,vibration:true,reducedMotion:false}, saved.settings||{})
     };
   }catch(e){
-    return {currentLevel:1,unlockedLevel:1,stars:{},rewards:{},history:[],seenTutorial:false,settings:{sound:true,vibration:true,reducedMotion:false}};
+    return {currentLevel:1,unlockedLevel:1,stars:{},rewards:{},history:[],seenTutorial:false,auth:null,settings:{sound:true,vibration:true,reducedMotion:false}};
   }
 }
 function saveState(){ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
@@ -316,7 +320,52 @@ function renderSettings(){
   document.getElementById('setSound').checked=!!state.settings.sound;
   document.getElementById('setVibration').checked=!!state.settings.vibration;
   document.getElementById('setMotion').checked=!!state.settings.reducedMotion;
+  const signedIn=!!(state.auth&&state.auth.code);
+  document.getElementById('settingsCode').textContent=signedIn?state.auth.code:'Not signed in';
+  document.getElementById('logOut').hidden=!(state.auth&&state.auth.loggedIn);
   applySettings();
+}
+
+/* ---------------- sign in / log in ---------------- */
+let authTab='signin';
+function syncAuthScreen(){
+  authTab=(state.auth&&state.auth.code)?'login':'signin';
+  renderAuthTab();
+}
+function renderAuthTab(){
+  const signup=authTab==='signin';
+  document.getElementById('tabSignin').classList.toggle('on',signup);
+  document.getElementById('tabLogin').classList.toggle('on',!signup);
+  document.getElementById('authHint').textContent=signup
+    ? 'Enter the 6-digit code from your receipt'
+    : 'Enter your 6-digit player code';
+  document.getElementById('authSubmit').textContent=signup?'CREATE PLAYER':'LOG IN';
+  document.getElementById('authError').textContent='';
+  const inputs=[...document.querySelectorAll('#code input')];
+  inputs.forEach(el=>el.value='');
+  inputs[0].focus();
+}
+function authCode(){
+  return [...document.querySelectorAll('#code input')].map(el=>el.value.replace(/\D/g,'')).join('');
+}
+function submitAuth(){
+  const code=authCode();
+  const err=document.getElementById('authError');
+  if(code.length!==6){ err.textContent='Enter all 6 digits.'; return; }
+  if(authTab==='signin'){
+    state.auth={code,loggedIn:true};
+    saveState(); blip(880,.12,'triangle',.05); go('s-home');
+  }else if(state.auth&&state.auth.code===code){
+    state.auth.loggedIn=true;
+    saveState(); blip(880,.12,'triangle',.05); go('s-home');
+  }else{
+    err.textContent='No player found with that code.';
+  }
+}
+function logOut(){
+  if(state.auth) state.auth.loggedIn=false;
+  saveState();
+  go('s-login');
 }
 function updateSetting(key,value){
   state.settings[key]=value;
@@ -325,7 +374,7 @@ function updateSetting(key,value){
   document.getElementById('settingsNote').textContent='Settings saved on this device.';
 }
 function resetProgress(){
-  state={currentLevel:1,unlockedLevel:1,stars:{},rewards:{},history:[],seenTutorial:false,settings:state.settings};
+  state={currentLevel:1,unlockedLevel:1,stars:{},rewards:{},history:[],seenTutorial:false,auth:state.auth,settings:state.settings};
   activeRewardId=null;
   justUnlockedReward=null;
   staffRewardId=null;
@@ -945,6 +994,10 @@ document.getElementById('setSound').onchange=e=>updateSetting('sound', e.target.
 document.getElementById('setVibration').onchange=e=>updateSetting('vibration', e.target.checked);
 document.getElementById('setMotion').onchange=e=>updateSetting('reducedMotion', e.target.checked);
 document.getElementById('resetProgress').onclick=resetProgress;
+document.getElementById('logOut').onclick=logOut;
+document.getElementById('tabSignin').onclick=()=>{ authTab='signin'; renderAuthTab(); };
+document.getElementById('tabLogin').onclick=()=>{ authTab='login'; renderAuthTab(); };
+document.getElementById('authSubmit').onclick=submitAuth;
 
 /* boosters */
 boShuffle.onclick=async()=>{
@@ -986,7 +1039,14 @@ async function useArmed(o){
 
 /* code inputs */
 document.querySelectorAll('#code input').forEach((el,i,arr)=>{
-  el.oninput=()=>{ if(el.value&&arr[i+1]) arr[i+1].focus(); };
+  el.oninput=()=>{
+    el.value=el.value.replace(/\D/g,'').slice(0,1);
+    if(el.value&&arr[i+1]) arr[i+1].focus();
+  };
+  el.onkeydown=e=>{
+    if(e.key==='Backspace'&&!el.value&&arr[i-1]) arr[i-1].focus();
+    else if(e.key==='Enter') submitAuth();
+  };
 });
 window.addEventListener('resize',()=>{
   if(!grid.length) return;

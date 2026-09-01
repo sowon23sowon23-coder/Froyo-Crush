@@ -35,18 +35,22 @@
   </section>
 
   <!-- 02 LOGIN -->
-  <section class="screen" id="s-login" data-name="02 Code">
+  <section class="screen" id="s-login" data-name="02 Sign in">
     <div class="logo" style="font-size:22px">Yogurtland<small>get real.</small></div>
-    <h2 style="font-family:var(--display);font-size:24px;margin:18px 0 2px;color:var(--berry-700)">Welcome to <span style="color:var(--magenta)">FROYO CRUSH</span></h2>
-    <p style="font-size:12px;color:#8C5A72;margin:0;font-weight:500">Enter the 6-digit code on your receipt</p>
-    <div class="code" id="code">
-      <input maxlength="1" value="1"><input maxlength="1" value="2"><input maxlength="1" value="3">
-      <input maxlength="1" value="4"><input maxlength="1" value="5"><input maxlength="1" value="6">
+    <h2 style="font-family:var(--display);font-size:24px;margin:16px 0 2px;color:var(--berry-700)">Welcome to <span style="color:var(--magenta)">FROYO CRUSH</span></h2>
+    <div class="segs" id="authTabs">
+      <button class="on" id="tabSignin">SIGN IN</button>
+      <button id="tabLogin">LOG IN</button>
     </div>
-    <button class="btn" data-go="s-home">START PLAYING</button>
-    <div style="display:flex;gap:26px;margin-top:22px;font-size:11px;font-weight:700;color:var(--magenta)">
+    <p id="authHint" style="font-size:12px;color:#8C5A72;margin:0;font-weight:500">Enter the 6-digit code from your receipt</p>
+    <div class="code" id="code">
+      <input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1">
+      <input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1">
+    </div>
+    <div class="auth-error" id="authError"></div>
+    <button class="btn" id="authSubmit">CREATE PLAYER</button>
+    <div style="display:flex;justify-content:center;margin-top:22px;font-size:11px;font-weight:700;color:var(--magenta)">
       <span data-go="s-how" style="cursor:pointer">❓ How to play</span>
-      <span data-go="s-rewards" style="cursor:pointer">🎁 My rewards</span>
     </div>
   </section>
 
@@ -300,6 +304,10 @@
         <span><b>Reduced motion</b><small>Lower flashes, bounce, and shake</small></span>
         <input type="checkbox" id="setMotion">
       </label>
+      <div class="setting-row">
+        <span><b>Player code</b><small id="settingsCode">Not signed in</small></span>
+        <button class="link-btn" id="logOut">Log out</button>
+      </div>
       <div class="settings-note" id="settingsNote">Progress is saved on this device.</div>
       <button class="btn ghost" id="resetProgress">RESET PROGRESS</button>
     </div>
